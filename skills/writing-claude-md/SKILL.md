@@ -109,7 +109,25 @@ Never use CLAUDE.md for code style enforcement. Use:
 - Pre-commit hooks
 - `rules/` directory
 
-### 5. Don't Auto-Generate
+### 5. Auto-Analyze Existing Repos
+
+When creating CLAUDE.md for an **existing repository**, auto-analyze instead of asking questions:
+
+```bash
+# Gather info automatically
+cat package.json          # Project name, description, scripts
+ls -la                    # Directory structure
+cat README.md | head -50  # Existing docs
+```
+
+Extract:
+- **WHAT**: From `package.json`, directory structure
+- **WHY**: From README.md description
+- **HOW**: From `package.json` scripts
+
+Only ask user for **Core Principles** if not obvious from existing docs.
+
+### 6. Don't Use /init
 
 Don't use `/init` to auto-generate CLAUDE.md. Manual crafting is worth it.
 
