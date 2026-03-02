@@ -17,6 +17,7 @@ Personal AI digital worker / AI clone powered by Claude Code.
 
 - `CLAUDE.md` - Global instructions (auto-loaded by Claude Code)
 - `memory-bank/` - Project knowledge:
+  - [architecture.md](memory-bank/architecture.md) - Project structure
   - [stack.md](memory-bank/stack.md) - Technology stack
   - [lint.md](memory-bank/lint.md) - Linting configuration
 
