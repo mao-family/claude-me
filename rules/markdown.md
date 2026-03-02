@@ -20,6 +20,7 @@
 - Use `**bold**` for emphasis
 - Use `\`code\`` for inline code
 - Use fenced code blocks with language specifier:
+
   ```bash
   # Good
   echo "Hello"
@@ -49,6 +50,27 @@ See [CLAUDE.md](CLAUDE.md) for details.
 Click [here](CLAUDE.md).
 ```
 
+## Line Breaks
+
+- **NEVER use trailing spaces for line breaks**
+- Use blank lines for paragraph separation
+- Use `<br>` if you truly need a line break within a paragraph (rare)
+
+```markdown
+# Bad - trailing spaces (invisible, fragile)
+This is line one.
+This is line two.
+
+# Good - blank line
+This is line one.
+
+This is line two.
+
+# Acceptable - explicit HTML (rare cases)
+This is line one.<br>
+This is line two.
+```
+
 ## Line Length
 
 - No strict line length limit (MD013 disabled)
@@ -57,6 +79,7 @@ Click [here](CLAUDE.md).
 ## Enforcement
 
 These rules are checked by:
+
 - `markdownlint` with `.markdownlint.json` config
 - Pre-commit hooks
 - CI pipeline
