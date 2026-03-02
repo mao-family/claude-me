@@ -13,48 +13,6 @@ claude-me is a personal AI digital worker / AI clone powered by Claude Code. It 
 5. **Encode Taste into Tooling** - Codify preferences into skills, agents, hooks
 6. **Progressive Disclosure** - Docs link to details, never duplicate
 
-## Directory Structure
-
-### Repository
-
-```text
-https://github.com/mao-family/claude-me
-~/Repos/claude-me/
-├── .claude-plugin/          # Plugin metadata
-├── skills/                  # Workflow guides (on-demand loading)
-├── agents/                  # Specialized sub-agents
-├── hooks/                   # Hook configuration (hooks.json)
-├── rules/                   # Coding standards (auto-loaded)
-├── scripts/                 # Utility scripts
-│   ├── hooks/               # Hook implementation scripts
-│   └── lint/                # Lint helper scripts
-├── tests/                   # Bats test files
-├── memory-bank/             # Project knowledge
-├── workspace/
-│   ├── repos/{project}/     # Child project repositories
-│   └── memory-bank/{project}/ # Child project knowledge
-├── CLAUDE.md                # Global instructions
-├── mcp.json                 # MCP server config
-└── settings.json            # Claude Code settings
-```
-
-### Runtime Symlinks
-
-The installation script creates symlinks from `~/.claude/` to the repository:
-
-```text
-~/.claude/
-├── CLAUDE.md → claude-me
-├── settings.json → claude-me
-├── rules/ → claude-me
-├── workspace/ → claude-me
-├── memory-bank/ → claude-me
-├── settings.local.json      # Local secrets (not in repo)
-└── plugins/                 # Plugin: claude-me@claude-me-marketplace
-
-~/.mcp.json → claude-me/mcp.json
-```
-
 ## Core Components
 
 ### Hooks
