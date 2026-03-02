@@ -96,23 +96,25 @@ original/ → generated/ → dist/ → publish
 
 ### Watch PR Merge Status
 
-After creating PR, poll until merged:
+Poll PR every **1 hour** until merged (PR merge depends on reviewer):
 
 ```bash
-# Watch PR until merged (returns when merged or closed)
-gh pr view <pr-number> --repo infinity-microsoft/labs-content --json state,mergedAt
+# Check PR state
+gh pr view <pr-number> --repo <repo> --json state,mergedAt
+
+# state: "OPEN" | "CLOSED" | "MERGED"
 ```
 
-### Watch Release Workflow
+### Watch Workflow
 
-After PR is merged, poll Release workflow status:
+Use `gh run watch` to block until complete (workflows are fast, ~30s-2min):
 
 ```bash
-# Get latest Release workflow run
-gh run list --repo infinity-microsoft/labs-content --workflow "Release" --limit 1
+# Get latest workflow run ID
+gh run list --repo <repo> --workflow "<workflow-name>" --limit 1 --json databaseId --jq '.[0].databaseId'
 
-# Watch until complete
-gh run watch <run-id> --repo infinity-microsoft/labs-content
+# Watch until complete (blocks)
+gh run watch <run-id> --repo <repo>
 ```
 
 ### Flowchart
