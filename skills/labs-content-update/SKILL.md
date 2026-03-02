@@ -80,8 +80,12 @@ original/ → generated/ → dist/ → publish
 | 9 | Claude | **Watch Release workflow until complete** |
 | 10 | Claude | **Trigger Publish: Staging automatically** |
 | 11 | Claude | **Watch Staging workflow until complete** |
-| 12 | Claude asks | "Staging published. Verify and publish to Production?" |
-| 13 | Claude | Trigger Publish: Production on release branch |
+| 12 | Claude | **Tell user picasso-assets PR URL, remind to merge** |
+| 13 | Claude | **Watch picasso-assets PR until merged** |
+| 14 | Claude | **Watch picasso-assets workflow until complete** |
+| 15 | Claude | **Tell user to verify at <https://www.copilot-stg.com/labs>** |
+| 16 | Claude asks | "Staging verified. Publish to Production?" |
+| 17 | Claude | Trigger Publish: Production on release branch |
 
 ### Watch PR Merge Status
 
