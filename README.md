@@ -42,6 +42,10 @@ claude plugin marketplace update claude-me-marketplace
 brew install bats-core shellcheck shfmt pre-commit
 pre-commit install
 
+# Symlink cache to marketplace (avoid stale cache on skill updates)
+rm -rf ~/.claude/plugins/cache/claude-me-marketplace
+ln -s ~/.claude/plugins/marketplaces/claude-me-marketplace ~/.claude/plugins/cache/claude-me-marketplace
+
 # Lint & Test
 bun run lint   # All checks (shellcheck, markdownlint, shfmt)
 bun run test   # Bats tests
