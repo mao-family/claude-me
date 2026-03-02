@@ -13,6 +13,11 @@
   "permissions": {
     "defaultMode": "bypassPermissions"
   },
+  "enabledPlugins": {
+    "superpowers@superpowers-marketplace": true,
+    "example-skills@anthropic-agent-skills": true,
+    "claude-me@claude-me-marketplace": true
+  },
   "extraKnownMarketplaces": {
     "superpowers-marketplace": {
       "source": {
@@ -32,11 +37,6 @@
         "repo": "mao-family/claude-me"
       }
     }
-  },
-  "enabledPlugins": {
-    "superpowers@superpowers-marketplace": true,
-    "example-skills@anthropic-agent-skills": true,
-    "claude-me@claude-me-marketplace": true
   },
   "skipDangerousModePermissionPrompt": true
 }
