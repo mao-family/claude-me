@@ -1,6 +1,6 @@
 ---
 name: research
-description: Conducts systematic research before development by gathering information from multiple sources (Slack, websites, PRDs, GitHub repos, design docs) and synthesizing insights. Use when user says "帮我研究 XXX", "做个调研", "research this", "investigate", or asks to understand a topic, technology, or external project before building something. Also triggers when comparing multiple solutions, evaluating third-party tools, or needing to understand how others have solved similar problems.
+description: Conducts systematic research before development by gathering information from multiple sources (Slack, websites, PRDs, GitHub repos, design docs) and synthesizing insights. Use when user says "research this", "investigate", or asks to understand a topic, technology, or external project before building something. Also triggers when comparing multiple solutions, evaluating third-party tools, or needing to understand how others have solved similar problems.
 ---
 
 # Research Skill
@@ -9,7 +9,7 @@ Conduct structured research before development to make informed decisions.
 
 ## When to Use
 
-- User explicitly asks for research ("帮我研究", "做个调研", "research this")
+- User explicitly asks for research ("research this", "investigate")
 - Evaluating third-party tools, frameworks, or approaches
 - Understanding how others solved similar problems
 - Comparing multiple solutions before choosing one
@@ -30,14 +30,14 @@ If the user has already provided specific sources, skip to Step 2.
 
 Otherwise, ask what sources to research:
 
-> "你想研究哪些内容？可以是：
+> "What sources would you like me to research?
 >
-> - 网站 URL
-> - GitHub 仓库
-> - Slack 频道/消息
-> - PRD 或设计文档
-> - Notion 页面
-> - 其他任何资料"
+> - Website URLs
+> - GitHub repositories
+> - Slack channels/messages
+> - PRDs or design documents
+> - Notion pages
+> - Any other materials"
 
 Wait for user input. Don't assume sources.
 
@@ -52,7 +52,7 @@ Each research agent should:
 3. Analyze strengths and weaknesses
 4. Identify takeaways relevant to claude-me
 
-Output each research doc to `memory-bank/research/{topic}.md`.
+Output each research doc to `memory-bank/research/{source}.md`.
 
 **Research Document Template:**
 
@@ -162,8 +162,8 @@ Before writing markdown, invoke the `writing-docs` skill to ensure proper format
 ### Example 1: Single source
 
 ```text
-User: 帮我研究一下 obra/superpowers 这个项目
-Claude: 好的，我来研究 obra/superpowers...
+User: Research the obra/superpowers project
+Claude: I'll research obra/superpowers...
 → Output: memory-bank/research/superpowers.md
 → Output: memory-bank/insights/superpowers.md
 ```
@@ -171,12 +171,12 @@ Claude: 好的，我来研究 obra/superpowers...
 ### Example 2: Multiple sources
 
 ```text
-User: 做个调研，关于 vibe coding 的最佳实践，看看这几个项目：
+User: Research vibe coding best practices from these projects:
 - https://github.com/EnzeD/vibe-coding
 - https://github.com/everything-claude-code
-- OpenAI 的 harness engineering 文章
+- OpenAI's harness engineering article
 
-Claude: 我会并行研究这三个来源...
+Claude: I'll research these three sources in parallel...
 → 3 agents spawn in parallel
 → Output: memory-bank/research/vibe-coding.md
 → Output: memory-bank/research/everything-claude-code.md
