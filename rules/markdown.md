@@ -73,7 +73,7 @@ Some output here
 
 NOT:
 
-<!-- markdownlint-disable MD040 -->
+<!-- markdownlint-disable MD040 -- Example of bad code without language -->
 ```
 # Bad - no language specified
 echo "hello"

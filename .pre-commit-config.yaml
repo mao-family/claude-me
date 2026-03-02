@@ -43,6 +43,13 @@ repos:
   # Run tests before commit
   - repo: local
     hooks:
+      - id: check-lint-disables
+        name: Check lint disables have reasons
+        entry: ./scripts/lint/check-lint-disables.sh
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
       - id: bats-tests
         name: Run Bats Tests
         entry: bash -c 'command -v bats &>/dev/null && bats tests/hooks.bats || echo "bats not installed, skipping tests"'
