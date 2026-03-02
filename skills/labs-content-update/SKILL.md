@@ -166,17 +166,21 @@ Covers are images or videos displayed on homepage and landing pages.
 content/original/{exp}/*.jpg  →  content/dist/  →  picasso-assets  →  CDN
 ```
 
+**可以一次完成**：媒体文件和 metadata.json 可以同时更新，因为 URL 是可预测的。
+
+### Steps
+
 1. **Place media file** in `content/original/{experiment}/` directory
-2. **Run tests** - build-configs.js copies media to `content/generated/`
-3. **Merge to main** - release.js copies media to `content/dist/`
-4. **Publish Staging** - `--sync-media` flag syncs media to picasso-assets
-5. **After picasso-assets PR merges** - Media available at CDN URL
+2. **Update metadata.json** with the predictable CDN URL:
 
-### CDN URL Pattern
+   ```text
+   https://copilot.microsoft.com/static/copilotlabs/{filename}
+   ```
 
-```text
-https://copilot.microsoft.com/static/copilotlabs/{filename}
-```
+3. **Run tests** - build-configs.js copies media to `content/generated/`
+4. **Merge to main** - release.js copies media to `content/dist/`
+5. **Publish Staging with `--sync-media`** - syncs media to picasso-assets
+6. **After picasso-assets PR merges** - Media available at CDN URL
 
 ### Update metadata.json
 
