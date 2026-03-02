@@ -1,42 +1,42 @@
-# Shell/Plugin 项目工程化最佳实践 - Insights
+# Shell/Plugin Project Engineering Best Practices - Insights
 
-**来源**: 13 个优秀项目的横向对比分析
-**适用**: claude-me 及类似的 Shell + Claude Code 插件项目
+**Source**: Cross-comparison analysis of 13 excellent projects
+**Applicable**: claude-me and similar Shell + Claude Code plugin projects
 
 ---
 
-## 核心发现
+## Core Findings
 
-### 1. 分层配置架构是最优解
+### 1. Layered Configuration Architecture is Optimal
 
 ```
-通用层 (common/) → 语言层 (typescript/, shell/) → 项目层 (local/)
+Common Layer (common/) → Language Layer (typescript/, shell/) → Project Layer (local/)
 ```
 
-**效果**: 减少重复 50%+，易于维护和扩展
+**Effect**: 50%+ reduction in duplication, easy to maintain and extend
 
-### 2. 钩子驱动自动化 > 人工记忆
+### 2. Hook-Driven Automation > Manual Memory
 
-所有顶级项目使用钩子自动化：
+All top-tier projects use hook automation:
 - Shell: pre-commit hooks
 - Claude Code: SessionStart, PreToolUse, PostToolUse
 
-**效果**: 零手动操作，质量门强制执行
+**Effect**: Zero manual operations, quality gates enforced
 
-### 3. TDD 是非协商的
+### 3. TDD is Non-Negotiable
 
-| 项目 | 覆盖目标 | 强制方式 |
-|------|---------|---------|
-| everything-claude-code | 80% | 规则强制 |
-| superpowers | N/A | 技能强制 |
-| asdf | N/A | CI 失败 |
+| Project | Coverage Target | Enforcement |
+|---------|-----------------|-------------|
+| everything-claude-code | 80% | Rule-enforced |
+| superpowers | N/A | Skill-enforced |
+| asdf | N/A | CI failure |
 
 ---
 
-## claude-me 推荐工具栈
+## Recommended Tool Stack for claude-me
 
-| 类别 | 工具 | 版本 | 配置文件 |
-|------|------|------|---------|
+| Category | Tool | Version | Config File |
+|----------|------|---------|-------------|
 | **Linting** | ShellCheck | 0.9.0+ | `.shellcheckrc` |
 | **Formatting** | shfmt | 3.7.0+ | `.editorconfig` |
 | **Testing** | Bats-core | 1.13.0+ | `tests/*.bats` |
@@ -48,21 +48,21 @@
 
 ---
 
-## 推荐配置
+## Recommended Configurations
 
 ### .shellcheckrc
 
 ```bash
-# 指定 shell 方言
+# Specify shell dialect
 shell=bash
 
-# 禁用特定警告 (根据项目需要)
+# Disable specific warnings (as needed)
 disable=SC2086,SC2046
 
-# 启用外部源
+# Enable external sources
 external-sources=true
 
-# 源路径
+# Source path
 source-path=.
 ```
 
@@ -153,7 +153,7 @@ module.exports = {
 
 ---
 
-## 项目结构建议
+## Recommended Project Structure
 
 ```
 claude-me/
@@ -189,42 +189,42 @@ claude-me/
 
 ---
 
-## Makefile 模板
+## Makefile Template
 
 ```makefile
 .PHONY: install lint format test check all
 
-# 安装依赖
+# Install dependencies
 install:
 	brew install shellcheck shfmt bats-core pre-commit
 	pre-commit install
 	pre-commit install --hook-type commit-msg
 
-# 代码检查
+# Lint code
 lint:
 	shellcheck -x hooks/*.sh scripts/*.sh tests/*.sh
 
-# 格式化
+# Format code
 format:
 	shfmt -i 2 -ci -w hooks/*.sh scripts/*.sh
 
-# 格式检查 (CI 用)
+# Format check (for CI)
 format-check:
 	shfmt -i 2 -ci -d hooks/*.sh scripts/*.sh
 
-# 运行测试
+# Run tests
 test:
 	bats tests/*.bats
 
-# Markdown 检查
+# Markdown lint
 lint-md:
 	markdownlint "**/*.md"
 
-# 完整检查
+# Full check
 check: lint format-check lint-md test
 	@echo "All checks passed!"
 
-# 默认目标
+# Default target
 all: check
 ```
 
@@ -294,53 +294,53 @@ jobs:
 
 ---
 
-## 实施计划
+## Implementation Plan
 
-### 第 1 周: 基础工具
+### Week 1: Basic Tools
 
-1. 安装工具: `brew install shellcheck shfmt bats-core pre-commit`
-2. 添加配置文件: `.shellcheckrc`, `.editorconfig`
-3. 运行首次检查: `shellcheck hooks/*.sh`
-4. 修复警告
+1. Install tools: `brew install shellcheck shfmt bats-core pre-commit`
+2. Add config files: `.shellcheckrc`, `.editorconfig`
+3. Run initial check: `shellcheck hooks/*.sh`
+4. Fix warnings
 
-### 第 2 周: 自动化
+### Week 2: Automation
 
-1. 添加 `.pre-commit-config.yaml`
-2. 安装 hooks: `pre-commit install`
-3. 添加 Makefile
-4. 测试完整流程
+1. Add `.pre-commit-config.yaml`
+2. Install hooks: `pre-commit install`
+3. Add Makefile
+4. Test complete workflow
 
-### 第 3 周: 测试
+### Week 3: Testing
 
-1. 迁移现有测试到 Bats 格式
-2. 添加新测试用例
-3. 目标: 80% 覆盖率
+1. Migrate existing tests to Bats format
+2. Add new test cases
+3. Target: 80% coverage
 
-### 第 4 周: CI/CD
+### Week 4: CI/CD
 
-1. 添加 GitHub Actions
-2. 配置 Commitlint
-3. 可选: Release-Please
-
----
-
-## 预期改进
-
-| 方面 | 预期改进 |
-|------|---------|
-| 代码质量 | ↑ 50-70% |
-| 开发速度 | ↑ 20-30% |
-| 可维护性 | ↑ 60-80% |
-| 缺陷发现 | ↑ 80%+ |
+1. Add GitHub Actions
+2. Configure Commitlint
+3. Optional: Release-Please
 
 ---
 
-## 参考项目
+## Expected Improvements
 
-| 项目 | 星数 | 学习重点 |
-|------|------|---------|
-| oh-my-zsh | 171k | 模块化架构 |
-| nvm | 77k | 跨平台兼容 |
-| asdf | 21k | 测试框架 |
-| everything-claude-code | 55k | 分层规则 |
-| superpowers | 64k | 工作流强制 |
+| Aspect | Expected Improvement |
+|--------|---------------------|
+| Code Quality | ↑ 50-70% |
+| Development Speed | ↑ 20-30% |
+| Maintainability | ↑ 60-80% |
+| Bug Detection | ↑ 80%+ |
+
+---
+
+## Reference Projects
+
+| Project | Stars | Learning Focus |
+|---------|-------|----------------|
+| oh-my-zsh | 171k | Modular architecture |
+| nvm | 77k | Cross-platform compatibility |
+| asdf | 21k | Testing framework |
+| everything-claude-code | 55k | Layered rules |
+| superpowers | 64k | Workflow enforcement |
