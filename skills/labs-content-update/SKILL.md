@@ -25,7 +25,7 @@ Workflow for updating Copilot Labs experiment configurations, syncing schema cha
 |-----------|-----------------|---------------|
 | **Add new experiment** | Create `content/original/{name}/` with metadata.json + landing-page.md, update `settings.json` | Allocate new ID in settings.json |
 | **Modify experiment** | Edit `content/original/{name}/metadata.json` or `landing-page.md` | None |
-| **Sync schema from Studio** | Update `config.schema.json` + `metadata.schema.json`, may update multiple experiments | Pull Studio main branch first |
+| **Sync schema from Studio** | Update `config.schema.json` + `metadata.schema.json`, may update multiple experiments | Read via `gh api` |
 | **Disable experiment** | Set `enabled: false` in `settings.json` | Content stays, just hidden |
 | **Enable experiment** | Set `enabled: true` in `settings.json` | Content must exist |
 | **Update covers/media** | Edit `covers` array in metadata.json | URLs must be uploaded to CDN first |
@@ -39,12 +39,12 @@ digraph decide_operation {
   "User requests content update" -> "Ask: What type of update?";
   "Ask: What type of update?" -> "New experiment?" [label="add"];
   "Ask: What type of update?" -> "Modify metadata.json" [label="modify"];
-  "Ask: What type of update?" -> "Pull Studio main, map Zod to JSON Schema" [label="schema sync"];
+  "Ask: What type of update?" -> "Read labs-schemas.ts via gh api" [label="schema sync"];
   "Ask: What type of update?" -> "Edit settings.json enabled" [label="disable/enable"];
 
   "New experiment?" -> "Ask: experiment name, type, status";
   "Modify metadata.json" -> "Ask: which experiment, what to change";
-  "Pull Studio main, map Zod to JSON Schema" -> "Update both schema files";
+  "Read labs-schemas.ts via gh api" -> "Map Zod to JSON Schema";
   "Edit settings.json enabled" -> "Ask: which experiment";
 }
 ```
@@ -117,7 +117,13 @@ npm run test:e2e
 
 When Studio's `src/schemas/labs-schemas.ts` changes:
 
-1. **Pull Studio main branch** to see latest schema
+1. **Read schema file directly via gh**:
+
+   ```bash
+   gh api repos/infinity-microsoft/studio/contents/src/schemas/labs-schemas.ts \
+     --jq '.content' | base64 -d
+   ```
+
 2. **Map Zod to JSON Schema**:
    - `z.enum([...])` → `"enum": [...]`
    - `z.literal("X")` → `"const": "X"`
