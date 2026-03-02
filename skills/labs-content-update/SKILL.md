@@ -78,8 +78,8 @@ original/ → generated/ → dist/ → publish
 | 7 | Claude | **Tell user PR URL, remind to review diff and merge** |
 | 8 | Claude | **Watch PR until merged** |
 | 9 | Claude | **Watch Release workflow until complete** |
-| 10 | Claude asks | "Release done. Publish to Staging?" |
-| 11 | Claude | Trigger Publish: Staging on release branch |
+| 10 | Claude | **Trigger Publish: Staging automatically** |
+| 11 | Claude | **Watch Staging workflow until complete** |
 | 12 | Claude asks | "Staging published. Verify and publish to Production?" |
 | 13 | Claude | Trigger Publish: Production on release branch |
 
