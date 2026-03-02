@@ -156,6 +156,48 @@ Edit `settings.json`:
 
 **Note**: Disabling keeps content intact, just excludes from dist output.
 
+## Update Covers/Media
+
+Covers are images or videos displayed on homepage and landing pages.
+
+### Steps
+
+1. **Upload media to CDN first** - Media must be hosted at `https://copilot.microsoft.com/static/copilotlabs/`
+2. **Edit metadata.json** `covers` array:
+
+```json
+"covers": [
+  {
+    "type": "IMAGE",
+    "url": "https://copilot.microsoft.com/static/copilotlabs/{experiment}-cover-image.jpg",
+    "consumers": ["HOMEPAGE"]
+  },
+  {
+    "type": "VIDEO",
+    "url": "https://copilot.microsoft.com/static/copilotlabs/{experiment}-cover-video.mp4",
+    "width": 1920,
+    "height": 930,
+    "consumers": ["LANDING_PAGE"]
+  }
+]
+```
+
+### Cover Types
+
+| Type | Use Case | Required Fields |
+|------|----------|-----------------|
+| `IMAGE` | Static thumbnail | `type`, `url`, `consumers` |
+| `VIDEO` | Animated preview | `type`, `url`, `width`, `height`, `consumers` |
+
+### Consumer Types
+
+| Consumer | Where it appears |
+|----------|------------------|
+| `HOMEPAGE` | Labs homepage grid |
+| `LANDING_PAGE` | Experiment detail page |
+
+**Note**: One experiment can have multiple covers for different consumers and sizes.
+
 ## Publishing
 
 ### CRITICAL: Use Release Branch
