@@ -76,12 +76,21 @@ original/ → generated/ → dist/ → publish
 | 5 | Claude | Update baselines if needed |
 | 6 | Claude | Create branch, commit, push, create PR |
 | 7 | Claude | **Tell user PR URL, remind to review diff and merge** |
-| 8 | User | Review and merge PR |
+| 8 | Claude | **Watch PR until merged** |
 | 9 | Claude | **Watch Release workflow until complete** |
 | 10 | Claude asks | "Release done. Publish to Staging?" |
 | 11 | Claude | Trigger Publish: Staging on release branch |
 | 12 | Claude asks | "Staging published. Verify and publish to Production?" |
 | 13 | Claude | Trigger Publish: Production on release branch |
+
+### Watch PR Merge Status
+
+After creating PR, poll until merged:
+
+```bash
+# Watch PR until merged (returns when merged or closed)
+gh pr view <pr-number> --repo infinity-microsoft/labs-content --json state,mergedAt
+```
 
 ### Watch Release Workflow
 
