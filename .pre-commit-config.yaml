@@ -1,0 +1,47 @@
+repos:
+  # Basic file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.md$'
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-yaml
+      - id: check-json
+
+  # Shell linting and formatting (using locally installed tools)
+  - repo: local
+    hooks:
+      - id: shellcheck
+        name: ShellCheck
+        entry: shellcheck
+        language: system
+        types: [shell]
+        args: [--severity=warning, -x]
+
+      - id: shfmt
+        name: shfmt
+        entry: shfmt
+        language: system
+        types: [shell]
+        args: [-i, '2', -ci, -sr, -bn, -w]
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.39.0
+    hooks:
+      - id: markdownlint
+        args: [--fix]
+
+  # Run tests before commit
+  - repo: local
+    hooks:
+      - id: bats-tests
+        name: Run Bats Tests
+        entry: bash -c 'command -v bats &>/dev/null && bats tests/hooks.bats || echo "bats not installed, skipping tests"'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]

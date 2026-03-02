@@ -1,0 +1,22 @@
+# Enable all optional checks
+enable=add-default-case
+enable=avoid-nullary-conditions
+enable=check-extra-masked-returns
+enable=check-set-e-suppressed
+enable=check-unassigned-uppercase
+enable=deprecate-which
+enable=quote-safe-variables
+enable=require-double-brackets
+enable=require-variable-braces
+
+# Shell dialect
+shell=bash
+
+# Follow source commands
+external-sources=true
+source-path=SCRIPTDIR
+
+# Only disable rules with strong justification
+# SC1091: Cannot follow dynamic source (runtime paths)
+# SC1003: False positive for backslash escaping in case patterns
+disable=SC1091,SC1003
