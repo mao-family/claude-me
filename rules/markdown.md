@@ -10,6 +10,16 @@
 
 ## Headings
 
+**Every file MUST start with a h1 title:**
+
+```markdown
+# Document Title
+
+Content here...
+```
+
+**Exception:** Files with YAML frontmatter (like `SKILL.md`) should have h1 after the frontmatter.
+
 **Use ATX-style headers (`#`, `##`, `###`)**
 
 - One blank line before and after headers
