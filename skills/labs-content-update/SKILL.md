@@ -97,13 +97,22 @@ original/ → generated/ → dist/ → publish
 
 ### Watch PR Merge Status
 
-Poll PR every **1 hour** until merged (PR merge depends on reviewer):
+Poll PR every **1 hour**. Check if:
+
+1. **Already merged** → proceed to next step
+2. **Can be merged** (approved + checks passed) → auto merge, then proceed
+3. **Still waiting** → continue polling
 
 ```bash
-# Check PR state
-gh pr view <pr-number> --repo <repo> --json state,mergedAt
+# Check PR state and mergeability
+gh pr view <pr-number> --repo <repo> --json state,mergedAt,reviewDecision,mergeable
 
 # state: "OPEN" | "CLOSED" | "MERGED"
+# reviewDecision: "APPROVED" | "CHANGES_REQUESTED" | "REVIEW_REQUIRED" | null
+# mergeable: "MERGEABLE" | "CONFLICTING" | "UNKNOWN"
+
+# If approved and mergeable, auto merge
+gh pr merge <pr-number> --repo <repo> --merge
 ```
 
 ### Watch Workflow
