@@ -10,6 +10,11 @@ repos:
         args: [--maxkb=500]
       - id: check-yaml
       - id: check-json
+      - id: check-case-conflict
+      - id: check-symlinks
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: detect-private-key
 
   # Shell linting and formatting (using locally installed tools)
   - repo: local
