@@ -9,7 +9,7 @@ Personal AI digital worker / AI clone powered by Claude Code.
 3. **Repository = Single Source of Truth** - Everything lives in the repo
 4. **Test First, Always** - TDD by default
 5. **Encode Taste into Tooling** - Codify preferences into skills, agents, hooks
-6. **Progressive Disclosure** - Docs link to details, never duplicate (see [rules/documentation.md](rules/documentation.md))
+6. **Progressive Disclosure** - Docs link to details, never duplicate
 
 ## Knowledge Locations
 
