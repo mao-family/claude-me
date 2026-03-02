@@ -33,7 +33,10 @@ Restart Claude Code. Done!
 ```bash
 cd ~/Repos/claude-me && git pull
 claude plugin marketplace update claude-me-marketplace
+claude plugin install claude-me@claude-me-marketplace
 ```
+
+> **Note:** `marketplace update` pulls the latest code, `plugin install` updates the cached version. Restart Claude Code after updating.
 
 ## Development
 
@@ -42,13 +45,11 @@ claude plugin marketplace update claude-me-marketplace
 brew install bats-core shellcheck shfmt pre-commit
 pre-commit install
 
-# Symlink cache to marketplace (avoid stale cache on skill updates)
-rm -rf ~/.claude/plugins/cache/claude-me-marketplace
-ln -s ~/.claude/plugins/marketplaces/claude-me-marketplace ~/.claude/plugins/cache/claude-me-marketplace
-
 # Lint & Test
 bun run lint   # All checks (shellcheck, markdownlint, shfmt)
 bun run test   # Bats tests
 ```
+
+> **Tip:** During development, bump the version in `.claude-plugin/plugin.json` and run the update commands to test changes.
 
 See [memory-bank/lint.md](memory-bank/lint.md) for lint configuration details.
