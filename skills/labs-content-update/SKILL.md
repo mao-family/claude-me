@@ -14,7 +14,40 @@ Workflow for updating Copilot Labs experiment configurations, syncing schema cha
 - Updating experiment metadata (title, description, links, covers)
 - Syncing schema changes from `infinity-microsoft/studio` PRs
 - Adding new experiments
+- Disabling/enabling experiments
 - Publishing content to staging or production
+
+## First: Ask What Type of Update
+
+**ALWAYS ask the user which operation they need:**
+
+| Operation | Files to Modify | Special Steps |
+|-----------|-----------------|---------------|
+| **Add new experiment** | Create `content/original/{name}/` with metadata.json + landing-page.md, update `settings.json` | Allocate new ID in settings.json |
+| **Modify experiment** | Edit `content/original/{name}/metadata.json` or `landing-page.md` | None |
+| **Sync schema from Studio** | Update `config.schema.json` + `metadata.schema.json`, may update multiple experiments | Analyze Studio PR first |
+| **Disable experiment** | Set `enabled: false` in `settings.json` | Content stays, just hidden |
+| **Enable experiment** | Set `enabled: true` in `settings.json` | Content must exist |
+| **Update covers/media** | Edit `covers` array in metadata.json | URLs must be uploaded to CDN first |
+
+### Decision Flow
+
+```dot
+digraph decide_operation {
+  rankdir=TB;
+
+  "User requests content update" -> "Ask: What type of update?";
+  "Ask: What type of update?" -> "New experiment?" [label="add"];
+  "Ask: What type of update?" -> "Modify metadata.json" [label="modify"];
+  "Ask: What type of update?" -> "Analyze Studio PR" [label="schema sync"];
+  "Ask: What type of update?" -> "Edit settings.json enabled" [label="disable/enable"];
+
+  "New experiment?" -> "Ask: experiment name, type, status";
+  "Modify metadata.json" -> "Ask: which experiment, what to change";
+  "Analyze Studio PR" -> "Map Zod to JSON Schema";
+  "Edit settings.json enabled" -> "Ask: which experiment";
+}
+```
 
 ## Content Pipeline
 
@@ -95,6 +128,34 @@ When a Studio PR changes `src/schemas/labs-schemas.ts`:
    - `content/metadata.schema.json`
 4. **Update affected experiments** in `content/original/`
 
+## Add New Experiment
+
+1. **Create directory**: `content/original/{experiment-name}/`
+2. **Create metadata.json** with required fields:
+   - `name`, `alias`, `type` (FEATURE/PROJECT), `status`, `assets`
+3. **Create landing-page.md** with experiment description
+4. **Register in settings.json**:
+   - Add entry with unique `id` (increment from highest existing)
+   - Set `enabled: true`
+5. Run tests and update baselines
+
+## Disable/Enable Experiment
+
+Edit `settings.json`:
+
+```json
+{
+  "experiments": {
+    "experiment-name": {
+      "id": "X",
+      "enabled": false  // or true to enable
+    }
+  }
+}
+```
+
+**Note**: Disabling keeps content intact, just excludes from dist output.
+
 ## Publishing
 
 ### CRITICAL: Use Release Branch
@@ -142,11 +203,9 @@ gh workflow run "Publish: Production" --repo infinity-microsoft/labs-content \
 | Push directly to main | Create feature branch and PR |
 | Forget to update baselines | Run `npm run test:update-integration-baselines` |
 | Miss schema file | Update BOTH `config.schema.json` AND `metadata.schema.json` |
-| Wrong GitHub account | Use `gh auth switch --user shuyumao_microsoft` |
 
 ## Checklist
 
-- [ ] Switch to correct GitHub account (`gh auth status`)
 - [ ] Create feature branch (not direct to main)
 - [ ] Update schema files (if schema change)
 - [ ] Update experiment metadata
