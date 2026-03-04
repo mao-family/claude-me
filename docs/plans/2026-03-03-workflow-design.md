@@ -305,7 +305,8 @@ You MUST create a task for each of these items and complete them in order:
 3. **Propose 2-3 approaches** - with trade-offs and your recommendation
 4. **Present design** - in sections, get user approval after each section
 5. **Write design doc** - save to `features/{feature}/design.md` and commit
-6. **Transition to planning** - invoke writing-plans skill
+6. **Create worktree** - invoke `using-worktrees` skill for isolated workspace
+7. **Transition to planning** - invoke `writing-plans` skill
 
 ## Process Flow
 
@@ -317,7 +318,7 @@ Present design sections -> User approves? -> Write design doc
         |                      | no
         |                   Revise
         v
-Invoke writing-plans skill
+Create worktree (using-worktrees) -> Invoke writing-plans skill
 ```
 
 ## The Process
@@ -368,9 +369,14 @@ Task tool:
   - Child projects: `workspace/memory-bank/{project}/features/{feature}/design.md`
 - Commit the design document to git
 
+**Create Isolated Workspace:**
+
+- Invoke `using-worktrees` skill to create git worktree
+- This ensures writing-plans and executing-plans work in isolation
+
 **Implementation:**
 
-- Invoke the writing-plans skill to create detailed implementation plan
+- Invoke the `writing-plans` skill to create detailed implementation plan
 - Do NOT invoke any other skill. writing-plans is the next step.
 
 ## Key Principles
@@ -552,7 +558,7 @@ Execute plan by dispatching fresh subagent per task, with parallel review team a
 ## Prerequisites
 
 - Implementation plan exists in `features/{feature}/plan.md`
-- Git worktree created for isolation (optional but recommended)
+- Git worktree already created by brainstorming skill (isolated workspace)
 
 ## Initialization
 
@@ -875,6 +881,173 @@ After completing:
 1. Update relevant docs if architecture changed
 2. Add insights to `memory-bank/insights/` if learned something
 3. Update `CLAUDE.md` if new patterns emerged
+
+```
+
+---
+
+#### 6. using-worktrees
+
+**File:** `skills/using-worktrees/skill.md`
+
+**Responsibility:** Create isolated git worktree for feature development
+
+**Reference:** superpowers `using-git-worktrees`
+
+```markdown
+---
+name: using-worktrees
+description: Use when starting feature work that needs isolation - creates isolated git worktrees with safety verification
+---
+
+# Using Git Worktrees
+
+## Overview
+
+Git worktrees create isolated workspaces sharing the same repository, allowing work on multiple branches simultaneously without switching.
+
+**Core principle:** Systematic directory selection + safety verification = reliable isolation.
+
+**Announce at start:** "I'm using the using-worktrees skill to set up an isolated workspace."
+
+## Directory Selection Process
+
+Follow this priority order:
+
+### 1. Check Existing Directories
+
+```bash
+# Check in priority order
+ls -d .worktrees 2>/dev/null     # Preferred (hidden)
+ls -d worktrees 2>/dev/null      # Alternative
+```
+
+**If found:** Use that directory.
+
+### 2. Check CLAUDE.md
+
+```bash
+grep -i "worktree.*director" CLAUDE.md 2>/dev/null
+```
+
+**If preference specified:** Use it without asking.
+
+### 3. Ask User
+
+If no directory exists and no CLAUDE.md preference:
+
+```text
+No worktree directory found. Where should I create worktrees?
+
+1. .worktrees/ (project-local, hidden)
+2. worktrees/ (project-local, visible)
+
+Which would you prefer?
+```
+
+## Safety Verification
+
+**MUST verify directory is ignored before creating worktree:**
+
+```bash
+git check-ignore -q .worktrees 2>/dev/null
+```
+
+**If NOT ignored:**
+
+1. Add to .gitignore
+2. Commit the change
+3. Proceed with worktree creation
+
+**Why critical:** Prevents accidentally committing worktree contents to repository.
+
+## Creation Steps
+
+### 1. Detect Project and Feature Name
+
+```bash
+project=$(basename "$(git rev-parse --show-toplevel)")
+feature_name="feature/${FEATURE_NAME}"
+```
+
+### 2. Create Worktree
+
+```bash
+path=".worktrees/${FEATURE_NAME}"
+git worktree add "${path}" -b "${feature_name}"
+cd "${path}"
+```
+
+### 3. Run Project Setup
+
+Auto-detect and run appropriate setup:
+
+```bash
+# Node.js
+if [ -f package.json ]; then npm install; fi
+
+# Bun
+if [ -f bun.lockb ]; then bun install; fi
+
+# Python
+if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+```
+
+### 4. Verify Clean Baseline
+
+Run tests to ensure worktree starts clean:
+
+```bash
+npm test  # or project-appropriate command
+```
+
+**If tests fail:** Report failures, ask whether to proceed.
+**If tests pass:** Report ready.
+
+### 5. Report Location
+
+```text
+Worktree ready at <full-path>
+Tests passing (<N> tests, 0 failures)
+Ready to implement <feature-name>
+```
+
+## Quick Reference
+
+| Situation | Action |
+|-----------|--------|
+| `.worktrees/` exists | Use it (verify ignored) |
+| `worktrees/` exists | Use it (verify ignored) |
+| Neither exists | Check CLAUDE.md → Ask user |
+| Directory not ignored | Add to .gitignore + commit |
+| Tests fail during baseline | Report failures + ask |
+
+## Red Flags
+
+**Never:**
+
+- Create worktree without verifying it's ignored
+- Skip baseline test verification
+- Proceed with failing tests without asking
+- Assume directory location when ambiguous
+
+**Always:**
+
+- Follow directory priority: existing > CLAUDE.md > ask
+- Verify directory is ignored for project-local
+- Auto-detect and run project setup
+- Verify clean test baseline
+
+## Integration
+
+**Called by:**
+
+- **brainstorming** - REQUIRED when design is approved
+
+**Pairs with:**
+
+- **finishing-branch** - Cleanup worktree after work complete
+- **writing-plans** and **executing-plans** - Work happens in this worktree
 
 ```
 
@@ -1641,6 +1814,8 @@ claude-me/
 |   |   +-- skill.md
 |   |-- finishing-branch/
 |   |   +-- skill.md
+|   |-- using-worktrees/
+|   |   +-- skill.md
 |   +-- ... (existing skills)
 |
 |-- agents/
@@ -1712,6 +1887,7 @@ workspace/memory-bank/{project}/
 |-------|------------|----------|
 | 1 | `using-skills` skill | HIGH |
 | 1 | `brainstorming` skill | HIGH |
+| 1 | `using-worktrees` skill | HIGH |
 | 1 | `writing-plans` skill | HIGH |
 | 1 | `architect` agent | HIGH |
 | 1 | `planner` agent | HIGH |
