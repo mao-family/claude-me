@@ -126,6 +126,15 @@ User: "I want to add a new feature"
          | design approved
          v
 +-------------------------------------------------------------------------+
+| Stage 1.5: CREATE WORKTREE (skill: using-worktrees)                     |
+| - Create isolated git worktree for feature development                  |
+| - Verify .worktrees/ is in .gitignore                                   |
+| - Run project setup (npm install, etc.)                                 |
+| - Verify clean test baseline                                            |
++-------------------------------------------------------------------------+
+         |
+         v
++-------------------------------------------------------------------------+
 | Stage 2: PLAN (skill: writing-plans)                                    |
 | - Create implementation plan based on design doc                        |
 | - Task granularity: 2-5 minutes                                         |
@@ -137,7 +146,7 @@ User: "I want to add a new feature"
          v
 +-------------------------------------------------------------------------+
 | Stage 3: EXECUTE (skill: executing-plans)                               |
-| - Create git worktree for isolation                                     |
+| - Work in existing worktree (created in Stage 1.5)                      |
 | - Per task:                                                             |
 |   1. Dispatch implementer agent (TDD implementation)                    |
 |   2. Dispatch review team (parallel via Agent Teams):                   |
