@@ -1,11 +1,19 @@
 # Using Lint Tools
 
-## Never Disable Without Justification
+## Fix First, Disable Last
+
+**Priority order when lint fails:**
+
+1. **Auto-fix** - Check `package.json` for scripts with `fix` in the name
+2. **Manual fix** - Refactor code to satisfy the rule
+3. **Disable** - Only as last resort, with justification
 
 **Every disable must have:**
 
 1. A clear reason in a comment
-2. The narrowest possible scope
+2. The narrowest possible scope (prefer `next-line` over `disable`)
+
+## Disable Syntax by Tool
 
 ### Shell (ShellCheck)
 
@@ -57,6 +65,8 @@ const scopes = token.scopes;
 
 ## Pre-approved Disables
 
+These rules can be disabled without additional justification:
+
 | Tool | Rule | Reason |
 |------|------|--------|
 | ShellCheck | SC1091 | Cannot follow dynamic source paths |
@@ -72,15 +82,4 @@ const scopes = token.scopes;
 git commit --no-verify
 
 # If a check fails, FIX the issue
-```
-
-## Prefer Auto-fix Over Disable
-
-```bash
-# Bad
-# shfmt: ignore
-
-# Good
-shfmt -w script.sh
-bun run lint:markdown  # auto-fix
 ```
