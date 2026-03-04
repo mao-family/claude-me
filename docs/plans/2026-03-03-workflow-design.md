@@ -2162,6 +2162,166 @@ model: haiku
 
 ---
 
+### Developer Expert Agents
+
+Developer expert agents learn from a specific person's code and code reviews, capturing their style, preferences, and quality standards. This allows AI to emulate their approach or review code as they would.
+
+#### Concept
+
+Analyze a developer's:
+
+| Source | What to Learn |
+|--------|---------------|
+| Git commits | Code style, naming, structure |
+| PR reviews given | What they focus on, common feedback |
+| PR descriptions | How they communicate changes |
+| Code comments | Documentation style |
+
+#### Use Cases
+
+| Scenario | Value |
+|----------|-------|
+| **Writing code** | Emulate their style for consistency |
+| **Self-review** | Catch issues they would flag before PR |
+| **Learning** | Extract best practices from experts |
+| **Onboarding** | New team members learn team standards |
+
+#### 11. {name}-expert (Developer Expert Template)
+
+**File:** `agents/{name}-expert.md`
+
+**Responsibility:** Emulates a specific developer's coding style and review standards
+
+```markdown
+---
+name: {name}-expert
+description: Emulates {Name}'s coding style and review standards
+tools: ["Read", "Grep", "Glob"]
+model: haiku
+---
+
+You emulate {Name}'s coding style and review approach.
+
+## About {Name}
+
+[Role, experience, known for]
+
+## Coding Style
+
+Based on analysis of their commits:
+
+- **Naming:** [conventions they use]
+- **Functions:** [size, structure preferences]
+- **Comments:** [when and how they comment]
+- **Error handling:** [their approach]
+- **Testing:** [test style, coverage expectations]
+
+## Review Focus
+
+Based on analysis of their PR reviews, they commonly point out:
+
+1. [Pattern 1] - [example feedback]
+2. [Pattern 2] - [example feedback]
+3. [Pattern 3] - [example feedback]
+4. [Pattern 4] - [example feedback]
+
+## Patterns They Prefer
+
+- [Pattern preference 1]
+- [Pattern preference 2]
+- [Pattern preference 3]
+
+## Patterns They Dislike
+
+- [Anti-pattern 1] - [why]
+- [Anti-pattern 2] - [why]
+
+## When Called
+
+1. **As reviewer:** Review code as {Name} would, flag issues they would flag
+2. **As style guide:** Suggest how {Name} would write this code
+3. **As mentor:** Explain why {Name} prefers certain approaches
+```
+
+#### Data Collection Pipeline
+
+**Step 1: Extract data (script)**
+
+```bash
+#!/usr/bin/env bash
+# scripts/analyze-developer.sh
+
+developer="$1"
+output_dir="analysis/${developer}"
+mkdir -p "${output_dir}"
+
+# Extract commits
+git log --author="${developer}" --pretty=format:"%H" | head -100 | while read sha; do
+  git show "${sha}" >> "${output_dir}/commits.txt"
+done
+
+# Extract PR reviews (using gh CLI)
+gh api graphql -f query='
+  query($author: String!) {
+    search(query: "reviewed-by:{author} is:pr", type: ISSUE, first: 50) {
+      nodes {
+        ... on PullRequest {
+          number
+          reviews(author: $author, first: 10) {
+            nodes { body }
+          }
+        }
+      }
+    }
+  }
+' -f author="${developer}" > "${output_dir}/reviews.json"
+
+echo "Data extracted to ${output_dir}/"
+```
+
+**Step 2: Analyze with AI**
+
+```bash
+# Invoke AI to analyze the data
+claude "Analyze the code and reviews in analysis/${developer}/ and create a developer expert profile. Focus on:
+1. Coding style patterns
+2. Common review feedback themes
+3. Preferred/disliked patterns
+Output as markdown for agents/${developer}-expert.md"
+```
+
+**Step 3: Review and refine**
+
+- Human reviews the generated profile
+- Adjusts based on knowledge of the person
+- Commits to agents/
+
+#### Example: Creating a Developer Expert
+
+```bash
+# 1. Extract data
+./scripts/analyze-developer.sh "alice@company.com"
+
+# 2. Analyze with AI
+claude "Create developer expert from analysis/alice@company.com/"
+
+# 3. Review output
+cat agents/alice-expert.md
+
+# 4. Commit
+git add agents/alice-expert.md
+git commit -m "feat: add alice-expert developer agent"
+```
+
+#### Privacy Considerations
+
+- Only analyze public/team-accessible code and reviews
+- Get consent from the developer being analyzed
+- Focus on professional patterns, not personal information
+- Developer can review and approve their expert profile
+
+---
+
 ## Directory Structure
 
 ```text
@@ -2191,7 +2351,8 @@ claude-me/
 |   |-- react-reviewer.md      # Review team (haiku, read-only)
 |   |-- style-reviewer.md      # Review team (haiku, read-only)
 |   |-- review-aggregator.md   # Review team (sonnet, read-only)
-|   +-- {project}-expert.md    # Project experts (haiku, read-only)
+|   |-- {project}-expert.md    # Project experts (haiku, read-only)
+|   +-- {name}-expert.md       # Developer experts (haiku, read-only)
 |
 +-- features/                   # Feature development files
     +-- {feature-name}/
@@ -2281,6 +2442,7 @@ workspace/memory-bank/{project}/
 | `style-reviewer` | Review | haiku | Read-only | Naming/style |
 | `review-aggregator` | Review | sonnet | Read-only | Aggregate results |
 | `{project}-expert` | Plan/Execute | haiku | Read-only | Project patterns & conventions |
+| `{name}-expert` | Plan/Execute/Review | haiku | Read-only | Developer style & review standards |
 
 ---
 
