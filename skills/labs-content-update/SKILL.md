@@ -1,6 +1,6 @@
 ---
 name: labs-content-update
-description: Use when updating labs-content experiment configs, syncing schema changes from Studio PRs, publishing to staging/production, checking progress, or listing/viewing experiments. Triggers on "update labs content", "sync schema from studio", "publish staging", "publish production", "labs 进度", "check labs progress", "resume labs update", "list experiments", "列出实验", "show experiment", "查看实验".
+description: Use when updating labs-content experiment configs, syncing schema changes from Studio PRs, publishing to staging/production, checking progress, or listing/viewing experiments. Triggers on "update labs content", "sync schema from studio", "publish staging", "publish production", "check labs progress", "resume labs update", "list experiments", "show experiment", "experiment details".
 ---
 
 # Labs Content Update
@@ -49,7 +49,7 @@ original/ → generated/ → dist/ → publish
 
 ## List Experiments
 
-**When user asks:** "列出所有实验", "list experiments", "show labs"
+**When user asks:** "list experiments", "show labs", "list all experiments"
 
 ```bash
 # Read settings.json for IDs and enabled status
@@ -81,7 +81,7 @@ Summary: N experiments (X enabled, Y disabled)
 
 ## View Experiment Details
 
-**When user asks:** "查看 copilot-vision 详情", "show experiment X", "details of X"
+**When user asks:** "show experiment X", "details of X", "view X experiment"
 
 ```bash
 # Read metadata.json
@@ -148,90 +148,102 @@ Landing Page:
 
 ## Check Progress / Resume Workflow
 
-**When user asks:** "进度如何", "继续", "check progress", "resume"
+**When user asks:** "check progress", "resume", "status", "what's pending"
 
-Run these commands to detect current state:
+**CRITICAL: Track ALL in-flight updates, not just the latest one.**
+
+### Step 1: Collect All Recent Release Branches
 
 ```bash
-# 1. Check for open labs-content PRs
-gh pr list --repo infinity-microsoft/labs-content --state open --json number,title,headRefName,url
-
-# 2. Check for recent merged PRs (last 7 days)
-gh pr list --repo infinity-microsoft/labs-content --state merged --search "merged:>$(date -v-7d +%Y-%m-%d)" --json number,title,mergedAt,url
-
-# 3. Check release branches
-git fetch origin && git branch -r | grep release | tail -3
-
-# 4. Check recent workflow runs
-gh run list --repo infinity-microsoft/labs-content --limit 5 --json databaseId,name,status,conclusion,headBranch,createdAt
-
-# 5. Check picasso-assets PRs and their changed files
-gh pr list --repo infinity-microsoft/picasso-assets --state all --search "labs" --limit 5 --json number,title,state,mergedAt,url,files
-
-# 6. Check studio open PRs (from labs-content)
-gh pr list --repo infinity-microsoft/studio --state open --search "labs" --json number,title,url
+# Get all release branches from the last 30 days
+git fetch origin
+git branch -r | grep release | tail -10
 ```
 
-### Distinguish Staging vs Production PRs
+### Step 2: For Each Release Branch, Build Complete Tracking Chain
 
-For picasso-assets PRs, check the `files` field:
-
-| Changed File | PR Type |
-|--------------|---------|
-| `staging.config.json` | Staging (Step 12) |
-| `prod.config.json` | Production (Step 17) |
-
-If `--json files` is not supported, use per-PR query:
+Each release branch represents one update. Track its full pipeline:
 
 ```bash
-# Get files changed in a specific PR
+# 1. Find the labs-content PR that created this release
+#    Release branch timestamp indicates when PR was merged
+#    Example: release/2026-02-26-091642 -> PR merged around 2026-02-26 09:16
+
+# 2. Find associated picasso-assets PRs by searching title and checking files
+gh pr list --repo infinity-microsoft/picasso-assets --state all --search "labs" --limit 20 \
+  --json number,title,state,mergedAt,createdAt
+
+# 3. For each picasso PR, check if it's staging or production
 gh pr view <pr-number> --repo infinity-microsoft/picasso-assets --json files --jq '.files[].path'
+# staging.config.json -> Staging PR
+# prod.config.json -> Production PR
+
+# 4. Find associated studio PRs (created by Production workflow)
+gh pr list --repo infinity-microsoft/studio --state all --search "labs markdown" --limit 10 \
+  --json number,title,state,mergedAt,createdAt
 ```
 
-### State Detection Matrix
+### Step 3: Correlate PRs to Release Branches by Timestamp
 
-| Detected State | Current Step | Next Action |
-|----------------|--------------|-------------|
-| Open PR in labs-content | 7 | Wait for merge, or remind user to review |
-| PR merged, no release branch newer than merge | 9 | Wait for Release workflow |
-| Release branch exists, no staging workflow run | 10 | Trigger Publish: Staging |
-| Staging workflow running | 10 | Wait for workflow to complete |
-| Staging workflow completed, no staging PR in picasso | 11 | Check workflow logs for error |
-| Open PR in picasso-assets (staging) | 12 | Wait for merge or auto-merge |
-| Staging PR merged, no production workflow | 14 | Ask user to verify staging, then trigger production |
-| Production workflow running | 15 | Wait for workflow to complete |
-| Production workflow completed (picasso PR + studio PR created) | 16 | Check both PRs |
-| Open PR in picasso-assets (production), studio PR open | 17 | Wait for picasso PR merge |
-| picasso PR (production) merged, studio PR open | 18-19 | User verify, remind to merge studio PR |
-| picasso PR merged, studio PR merged | Done | ✅ Complete |
+| Release Branch | Staging PR | Production PR | Studio PR |
+|----------------|------------|---------------|-----------|
+| release/2026-02-26-... | Created ~same day | Created after staging merged | Created by prod workflow |
+| release/2026-03-02-... | Created ~same day | Created after staging merged | Created by prod workflow |
 
-### Progress Report Format
+**Key insight:** PRs are created sequentially:
 
-After detecting state, report to user:
+1. Release branch created (auto, on PR merge)
+2. Staging workflow triggered -> picasso staging PR
+3. After staging merged -> Production workflow triggered -> picasso prod PR + studio PR
+
+### Step 4: Determine Status for Each Update
+
+For each release branch, check:
+
+| Check | Command | Status |
+|-------|---------|--------|
+| Staging PR exists? | Search picasso PRs by date | Yes/No |
+| Staging PR merged? | `gh pr view --json state` | Open/Merged |
+| Production PR exists? | Search picasso PRs by date | Yes/No |
+| Production PR merged? | `gh pr view --json state` | Open/Merged -> **Live** |
+| Studio PR merged? | `gh pr view --json state` | Open/Merged |
+
+### Progress Report Format (Multiple Updates)
 
 ```text
 ## Labs Content Update Progress
 
-**Operation:** [Add/Modify/Schema Sync] - [experiment name or description]
-**Started:** [date from first PR or branch]
+### Update 1: [Description from PR title]
+**Release:** release/2026-02-26-091642
+**Status:** ✅ Complete
 
-### Current Status
-- Step [N]/19: [Step description]
-- Status: [Waiting/In Progress/Blocked/Ready]
+| Stage | PR | Status |
+|-------|-----|--------|
+| labs-content | #39 | ✅ Merged |
+| picasso staging | #141 | ✅ Merged |
+| picasso production | #143 | ✅ Merged -> **Live** |
+| studio | #23000 | ✅ Merged |
 
-### Pending Items
-| Item | Status | Action Needed |
-|------|--------|---------------|
-| labs-content PR #123 | Merged ✅ | - |
-| Release workflow | Completed ✅ | - |
-| Publish: Staging workflow | Completed ✅ | - |
-| picasso-assets PR (staging) | Merged ✅ | - |
-| Publish: Production workflow | Completed ✅ | - |
-| picasso-assets PR (production) | Merged ✅ | 线上已生效 |
-| studio PR | Open ⏳ | 可异步 merge |
+---
 
-### Next Step
-[Describe what to do next]
+### Update 2: [Description from PR title]
+**Release:** release/2026-03-02-155350
+**Status:** ⏳ In Progress (Step 17/19)
+
+| Stage | PR | Status |
+|-------|-----|--------|
+| labs-content | #40 | ✅ Merged |
+| picasso staging | #147 | ✅ Merged |
+| picasso production | #156 | ⏳ Open |
+| studio | #23024 | ⏳ Open |
+
+**Next:** Merge picasso PR #156 -> goes live immediately
+
+---
+
+### Summary
+- 1 update complete
+- 1 update pending (waiting for PR merge)
 ```
 
 ## Complete Workflow
@@ -257,9 +269,9 @@ After detecting state, report to user:
 | **Production** | | |
 | 15 | Trigger Publish: Production | Production workflow running |
 | 16 | Watch Production workflow (creates BOTH picasso PR + studio PR) | Production workflow done |
-| 17 | Watch picasso-assets PR (production) until merged | picasso PR merged → **线上生效** |
+| 17 | Watch picasso-assets PR (production) until merged | picasso PR merged -> **Live** |
 | 18 | Tell user to verify at <https://www.copilot.microsoft.com/labs> | User confirms |
-| 19 | Remind user to merge studio PR (i18n + fallback, 可异步) | studio PR merged |
+| 19 | Remind user to merge studio PR (i18n + fallback, can be async) | studio PR merged |
 
 ### Watch PR / Workflow Commands
 
