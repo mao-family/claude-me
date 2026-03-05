@@ -116,19 +116,6 @@ Task complete (implementer)
 +-------------------------------------------------------------------------+
 ```
 
-### Reviewer Responsibilities
-
-| Reviewer | Model | Focus | Checks |
-|----------|-------|-------|--------|
-| **spec-reviewer** | haiku | Spec compliance | All requirements met? Missing features? Extra features (YAGNI)? |
-| **code-reviewer** | sonnet | Code quality | Error handling? Edge cases? Performance? Security? Readability? |
-| **typescript-reviewer** | haiku | TS best practices | Type safety? No `any`? No `as` casts? Proper generics? |
-| **react-reviewer** | haiku | React patterns | Hooks rules? Component structure? Re-render optimization? |
-| **style-reviewer** | haiku | Naming & style | Naming clarity? Consistency? File structure? Comments? |
-| **review-aggregator** | sonnet | Aggregate | Combine all reviews, determine final verdict, prioritize fixes |
-
-See [Agents section](#agents) for detailed reviewer definitions and templates.
-
 ## Execution Flow
 
 ```text
