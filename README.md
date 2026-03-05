@@ -10,7 +10,8 @@ See [CLAUDE.md](CLAUDE.md) for architecture and directory structure.
 
 ```bash
 # Install dependencies
-brew install fnm bun gh
+brew install fnm gh
+brew tap oven-sh/bun && brew install oven-sh/bun/bun
 echo 'eval "$(fnm env)"' >> ~/.zshrc && source ~/.zshrc
 fnm install --lts && fnm use --lts
 npm install -g @anthropic-ai/claude-code
