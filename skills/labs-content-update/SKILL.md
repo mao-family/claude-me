@@ -48,11 +48,11 @@ original/ → generated/ → dist/ → publish
 | Release | `content/dist/` | Merged configs by locale |
 | Publish | picasso-assets / studio | CDN and frontend repos |
 
-## Mandatory Checks
+## Execution Rules
 
-**MUST execute these checks - never skip:**
+### Mandatory (MUST execute - never skip)
 
-### Before ANY Modification
+#### Before ANY Modification
 
 ```bash
 # MUST: Check if Studio schema has updates
@@ -62,7 +62,7 @@ gh api repos/infinity-microsoft/studio/contents/src/schemas/labs-schemas.ts \
 
 Compare with local `content/config.schema.json` and `content/metadata.schema.json`. If different, sync schema first.
 
-### After ANY Modification
+#### After ANY Modification
 
 ```bash
 # MUST: Run integration tests
@@ -73,12 +73,30 @@ npm run test:update-integration-baselines
 npm run test:integration  # Run again to verify
 ```
 
-### Before Publishing
+#### Before Publishing
 
 ```bash
 # MUST: Find release branch (NEVER use main)
 gh api repos/infinity-microsoft/labs-content/branches --paginate \
   --jq '.[] | select(.name | startswith("release/")) | .name' | tail -1
+```
+
+### Watch (blocks until complete)
+
+```bash
+# Watch workflow until complete
+gh run list --repo infinity-microsoft/labs-content --workflow "<workflow-name>" --limit 1 --json databaseId --jq '.[0].databaseId'
+gh run watch <run-id> --repo infinity-microsoft/labs-content
+```
+
+### Poll (ask user before checking)
+
+```bash
+# Check PR state
+gh pr view <pr-number> --repo <repo> --json state,mergedAt
+
+# If merged, continue. If not:
+# ASK: "PR #X is still open. Continue waiting? (yes/no)"
 ```
 
 ## Complete Workflow
@@ -106,24 +124,6 @@ gh api repos/infinity-microsoft/labs-content/branches --paginate \
 | 16 | **ASK** user: "picasso production PR merged?" | Poll | picasso PR merged -> **Live** |
 | 17 | Tell user to verify at <https://www.copilot.microsoft.com/labs> | - | User confirms |
 | 18 | **ASK** user: "studio PR merged?" | Poll | studio PR merged |
-
-### Watch Commands (Mandatory - blocks until complete)
-
-```bash
-# Watch workflow until complete
-gh run list --repo infinity-microsoft/labs-content --workflow "<workflow-name>" --limit 1 --json databaseId --jq '.[0].databaseId'
-gh run watch <run-id> --repo infinity-microsoft/labs-content
-```
-
-### Poll Commands (Ask user before checking)
-
-```bash
-# Check PR state
-gh pr view <pr-number> --repo <repo> --json state,mergedAt
-
-# If merged, continue. If not:
-# ASK: "PR #X is still open. Continue waiting? (yes/no)"
-```
 
 ## Operations Reference
 
