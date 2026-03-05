@@ -2,7 +2,7 @@
 
 <!-- markdownlint-disable MD024 MD036 MD040 -- Document contains nested markdown code blocks (skill/agent templates), which causes false positives for fenced-code-language and duplicate-heading rules. Restructuring would lose the value of showing complete templates. -->
 
-**Date:** 2026-03-03 (Updated: 2026-03-04)
+**Date:** 2026-03-03 (Updated: 2026-03-05)
 
 **Status:** Draft
 
@@ -43,25 +43,40 @@ Create claude-me's own development workflow system, replacing superpowers plugin
 |          | 1% chance = MUST invoke                                      |
 |          v                                                              |
 |  +----------------+   +----------------+   +----------------+           |
-|  | brainstorming  |-->| writing-plans  |-->| executing-plans|           |
+|  | brainstorming  |-->|using-worktrees |-->| writing-plans  |           |
 |  |                |   |                |   |                |           |
-|  | <HARD-GATE>    |   | 2-5 min tasks  |   | TDD per task   |           |
-|  | No code before |   | Complete code  |   | subagent exec  |           |
-|  | design approved|   | + exact paths  |   |                |           |
+|  | <HARD-GATE>    |   | Create isolate |   | 2-5 min tasks  |           |
+|  | No code before |   | git worktree   |   | Complete code  |           |
+|  | design approved|   |                |   | + exact paths  |           |
 |  +-------+--------+   +-------+--------+   +-------+--------+           |
 |          |                    |                    |                    |
-|          | dispatch           | dispatch           | dispatch per task  |
-|          v                    v                    v                    |
-|     architect agent      planner agent   +----------------------+       |
-|     (opus, read-only)    (sonnet,        | implementer agent    |       |
-|                          read-only)      | review-team (parallel)|       |
-|                                          +----------+-----------+       |
-|                                                     |                   |
-|                                                     v                   |
+|          | dispatch           |                    | dispatch           |
+|          v                    |                    v                    |
+|     architect agent           |              planner agent              |
+|     (opus, read-only)         |              (sonnet, read-only)        |
+|                               |                    |                    |
+|                               +--------------------+                    |
+|                                                    |                    |
+|                                                    v                    |
 |                                          +----------------+             |
-|                                          |finishing-branch|             |
-|                                          | merge/PR/discard|             |
-|                                          +----------------+             |
+|                                          | executing-plans|             |
+|                                          |                |             |
+|                                          | TDD per task   |             |
+|                                          | subagent exec  |             |
+|                                          +-------+--------+             |
+|                                                  |                      |
+|                                                  | dispatch per task    |
+|                                                  v                      |
+|                                       +----------------------+          |
+|                                       | implementer agent    |          |
+|                                       | review-team (parallel)|         |
+|                                       +----------+-----------+          |
+|                                                  |                      |
+|                                                  v                      |
+|                                       +----------------+                |
+|                                       |finishing-branch|                |
+|                                       | merge/PR/discard|               |
+|                                       +----------------+                |
 +-------------------------------------------------------------------------+
 ```
 
@@ -100,6 +115,104 @@ Task complete (implementer)
 |                   Fail? -> implementer fixes -> re-review               |
 +-------------------------------------------------------------------------+
 ```
+
+### Reviewer Responsibilities
+
+| Reviewer | Model | Focus | Checks |
+|----------|-------|-------|--------|
+| **spec-reviewer** | haiku | Spec compliance | All requirements met? Missing features? Extra features (YAGNI)? |
+| **code-reviewer** | sonnet | Code quality | Error handling? Edge cases? Performance? Security? Readability? |
+| **typescript-reviewer** | haiku | TS best practices | Type safety? No `any`? No `as` casts? Proper generics? |
+| **react-reviewer** | haiku | React patterns | Hooks rules? Component structure? Re-render optimization? |
+| **style-reviewer** | haiku | Naming & style | Naming clarity? Consistency? File structure? Comments? |
+| **review-aggregator** | sonnet | Aggregate | Combine all reviews, determine final verdict, prioritize fixes |
+
+#### spec-reviewer
+
+**Purpose:** Ensure implementation matches the design specification exactly.
+
+**Checks:**
+
+- All requirements from design.md implemented?
+- Any features missing from spec?
+- Any extra features not in spec? (YAGNI violation)
+- Edge cases from spec covered?
+
+**Output:** PASS if spec fully implemented, FAIL with list of gaps/extras.
+
+#### code-reviewer
+
+**Purpose:** Ensure code quality, maintainability, and correctness.
+
+**Checks:**
+
+- Error handling: Are errors caught and handled appropriately?
+- Edge cases: What happens with null, empty, boundary values?
+- Performance: Any obvious inefficiencies? N+1 queries? Unnecessary loops?
+- Security: Input validation? SQL injection? XSS? Sensitive data exposure?
+- Readability: Is the code easy to understand? Could future developers maintain it?
+- Test coverage: Are the tests meaningful? Do they cover important cases?
+
+**Output:** APPROVED or categorized issues (Critical/Important/Suggestion).
+
+#### typescript-reviewer
+
+**Purpose:** Enforce TypeScript best practices and type safety.
+
+**Checks:**
+
+- No `any` types (explicit or implicit)
+- No `as` type casts (use type guards instead)
+- Proper use of generics
+- Correct interface/type definitions
+- Strict null checks respected
+- No `@ts-ignore` or `@ts-expect-error` without justification
+
+**Output:** PASS or list of type safety issues.
+
+#### react-reviewer
+
+**Purpose:** Enforce React patterns and prevent common React bugs.
+
+**Checks:**
+
+- Hooks rules: Called at top level? Same order every render?
+- Dependencies: useEffect/useMemo/useCallback deps correct?
+- Component structure: Props interface defined? Default props?
+- Re-render optimization: Unnecessary re-renders? Missing memoization?
+- State management: State in right place? Derived state computed correctly?
+- Accessibility: Semantic HTML? ARIA labels? Keyboard navigation?
+
+**Output:** PASS or list of React-specific issues.
+
+**Note:** Only applicable to React code. Returns N/A for non-React files.
+
+#### style-reviewer
+
+**Purpose:** Ensure consistent naming, structure, and style across codebase.
+
+**Checks:**
+
+- Naming clarity: Do names describe what things do? Abbreviations avoided?
+- Consistency: Does new code match existing patterns in the codebase?
+- File structure: Files in correct directories? Following project conventions?
+- Comments: Are complex parts explained? No obvious/redundant comments?
+- Formatting: Consistent with project style? (Usually handled by linter)
+
+**Output:** PASS or list of style suggestions (usually non-blocking).
+
+#### review-aggregator
+
+**Purpose:** Combine all reviewer outputs into a single actionable summary.
+
+**Responsibilities:**
+
+1. Read all reviewer JSON outputs
+2. Deduplicate overlapping findings
+3. Categorize by severity: Blocking > Warning > Suggestion
+4. Determine final verdict (PASS only if no blocking issues)
+5. Prioritize fixes (what to fix first)
+6. Generate human-readable summary
 
 ## Execution Flow
 
