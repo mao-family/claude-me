@@ -196,34 +196,40 @@ User: "I want to add a new feature"
 
 **Responsibility:** Entry skill, enforce all tasks check and invoke relevant skills
 
-**Reference:** superpowers `using-superpowers`
+**Reference:** [superpowers/using-superpowers](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/SKILL.md)
 
 ````markdown
 ---
 name: using-skills
-description: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response
+description: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions
 ---
 
 <EXTREMELY-IMPORTANT>
-If you think there is even a 1% chance a skill might apply to what you are doing,
-you ABSOLUTELY MUST invoke the skill.
+If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
 
 IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
 
 This is not negotiable. This is not optional. You cannot rationalize your way out of this.
 </EXTREMELY-IMPORTANT>
 
+## How to Access Skills
+
+**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.
+
+**In other environments:** Check your platform's documentation for how skills are loaded.
+
 # Using Skills
 
 ## The Rule
 
-**Invoke relevant skills BEFORE any response or action.** Even a 1% chance a skill might apply means you should invoke the skill to check.
-
-## Process Flow
+**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.
 
 ```dot
 digraph skill_flow {
     "User message received" [shape=doublecircle];
+    "About to EnterPlanMode?" [shape=doublecircle];
+    "Already brainstormed?" [shape=diamond];
+    "Invoke brainstorming skill" [shape=box];
     "Might any skill apply?" [shape=diamond];
     "Invoke Skill tool" [shape=box];
     "Announce: 'Using [skill] to [purpose]'" [shape=box];
@@ -231,6 +237,11 @@ digraph skill_flow {
     "Create TodoWrite todo per item" [shape=box];
     "Follow skill exactly" [shape=box];
     "Respond (including clarifications)" [shape=doublecircle];
+
+    "About to EnterPlanMode?" -> "Already brainstormed?";
+    "Already brainstormed?" -> "Invoke brainstorming skill" [label="no"];
+    "Already brainstormed?" -> "Might any skill apply?" [label="yes"];
+    "Invoke brainstorming skill" -> "Might any skill apply?";
 
     "User message received" -> "Might any skill apply?";
     "Might any skill apply?" -> "Invoke Skill tool" [label="yes, even 1%"];
@@ -243,18 +254,9 @@ digraph skill_flow {
 }
 ```
 
-## Checklist Mechanism
-
-**If a skill contains a Checklist section:**
-
-1. Create TodoWrite task for EACH checklist item
-2. Complete items in order
-3. Mark each task complete as you go
-4. Do not skip items
-
 ## Red Flags
 
-These thoughts mean STOP - you're rationalizing:
+These thoughts mean STOP—you're rationalizing:
 
 | Thought | Reality |
 |---------|---------|
@@ -275,8 +277,8 @@ These thoughts mean STOP - you're rationalizing:
 
 When multiple skills could apply, use this order:
 
-1. **Process skills first** (brainstorming, debugging) - determine HOW to approach
-2. **Implementation skills second** - guide execution
+1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task
+2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution
 
 "Let's build X" → brainstorming first, then implementation skills.
 "Fix this bug" → debugging first, then domain-specific skills.
@@ -302,7 +304,7 @@ Instructions say WHAT, not HOW. "Add X" or "Fix Y" doesn't mean skip workflows.
 
 **Responsibility:** Requirement exploration - design - output design.md
 
-**Reference:** superpowers `brainstorming`
+**Reference:** [superpowers/brainstorming](https://github.com/obra/superpowers/blob/main/skills/brainstorming/SKILL.md)
 
 ````markdown
 ---
@@ -427,7 +429,7 @@ Task tool:
 
 **Responsibility:** Design - 2-5 minute granular tasks - plan.md
 
-**Reference:** superpowers `writing-plans` + ECC `planner` agent
+**Reference:** [superpowers/writing-plans](https://github.com/obra/superpowers/blob/main/skills/writing-plans/SKILL.md) + [ECC/planner](https://github.com/affaan-m/everything-claude-code/blob/main/agents/planner.md)
 
 ````markdown
 ---
@@ -662,7 +664,7 @@ Then invoke `executing-plans` skill.
 
 **Responsibility:** Execute plan, dispatch agent per task, maintain findings.md and progress.md
 
-**Reference:** superpowers `subagent-driven-development` + [planning-with-files](https://github.com/OthmanAdi/planning-with-files)
+**Reference:** [superpowers/subagent-driven-development](https://github.com/obra/superpowers/blob/main/skills/subagent-driven-development/SKILL.md) + [planning-with-files](https://github.com/OthmanAdi/planning-with-files)
 
 ````markdown
 ---
@@ -914,7 +916,7 @@ Invoke `finishing-branch` skill to complete the development cycle.
 
 **Responsibility:** Complete development cycle, merge/PR/discard
 
-**Reference:** superpowers `finishing-a-development-branch`
+**Reference:** [superpowers/finishing-a-development-branch](https://github.com/obra/superpowers/blob/main/skills/finishing-a-development-branch/SKILL.md)
 
 ````markdown
 ---
@@ -1013,7 +1015,7 @@ After completing:
 
 **Responsibility:** Create isolated git worktree for feature development
 
-**Reference:** superpowers `using-git-worktrees`
+**Reference:** [superpowers/using-git-worktrees](https://github.com/obra/superpowers/blob/main/skills/using-git-worktrees/SKILL.md)
 
 ````markdown
 ---
@@ -1263,7 +1265,7 @@ When context is tight:
 
 **Responsibility:** Architecture decision support
 
-**Reference:** ECC `architect.md`
+**Reference:** [ECC/architect](https://github.com/affaan-m/everything-claude-code/blob/main/agents/architect.md)
 
 ````markdown
 ---
@@ -1368,7 +1370,7 @@ Watch for these anti-patterns:
 
 **Responsibility:** Task breakdown support
 
-**Reference:** ECC `planner.md`
+**Reference:** [ECC/planner](https://github.com/affaan-m/everything-claude-code/blob/main/agents/planner.md)
 
 ````markdown
 ---
@@ -1497,7 +1499,7 @@ Expected: PASS
 
 **Responsibility:** TDD implementation
 
-**Reference:** ECC `tdd-guide.md`
+**Reference:** [ECC/tdd-guide](https://github.com/affaan-m/everything-claude-code/blob/main/agents/tdd-guide.md)
 
 ````markdown
 ---
@@ -1660,7 +1662,7 @@ Required fixes before proceeding.
 
 **Responsibility:** Code quality review
 
-**Reference:** superpowers `code-reviewer`
+**Reference:** [superpowers/requesting-code-review](https://github.com/obra/superpowers/blob/main/skills/requesting-code-review/SKILL.md)
 
 ````markdown
 ---
