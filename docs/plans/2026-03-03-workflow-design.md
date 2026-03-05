@@ -296,7 +296,7 @@ User: "I want to add a new feature"
 
 **Reference:** superpowers `using-superpowers`
 
-```markdown
+````markdown
 ---
 name: using-skills
 description: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response
@@ -390,7 +390,7 @@ The skill itself tells you which.
 ## User Instructions
 
 Instructions say WHAT, not HOW. "Add X" or "Fix Y" doesn't mean skip workflows.
-```
+````
 
 ---
 
@@ -402,7 +402,7 @@ Instructions say WHAT, not HOW. "Add X" or "Fix Y" doesn't mean skip workflows.
 
 **Reference:** superpowers `brainstorming`
 
-```markdown
+````markdown
 ---
 name: brainstorming
 description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
@@ -515,7 +515,7 @@ Task tool:
 - **Explore alternatives** - Always propose 2-3 approaches before settling
 - **Incremental validation** - Present design in sections, validate each
 
-```
+````
 
 ---
 
@@ -527,7 +527,7 @@ Task tool:
 
 **Reference:** superpowers `writing-plans` + ECC `planner` agent
 
-```markdown
+````markdown
 ---
 name: writing-plans
 description: Use when you have a spec or requirements for a multi-step task, before touching code
@@ -750,7 +750,7 @@ After saving the plan:
 
 Then invoke `executing-plans` skill.
 
-```
+````
 
 ---
 
@@ -762,7 +762,7 @@ Then invoke `executing-plans` skill.
 
 **Reference:** superpowers `subagent-driven-development` + [planning-with-files](https://github.com/OthmanAdi/planning-with-files)
 
-```markdown
+````markdown
 ---
 name: executing-plans
 description: Use when you have an implementation plan to execute
@@ -1002,7 +1002,7 @@ Task tool:
 
 Invoke `finishing-branch` skill to complete the development cycle.
 
-```
+````
 
 ---
 
@@ -1014,7 +1014,7 @@ Invoke `finishing-branch` skill to complete the development cycle.
 
 **Reference:** superpowers `finishing-a-development-branch`
 
-```markdown
+````markdown
 ---
 name: finishing-branch
 description: Use when implementation is complete and you need to decide how to integrate the work
@@ -1101,7 +1101,7 @@ After completing:
 2. Add insights to `memory-bank/insights/` if learned something
 3. Update `CLAUDE.md` if new patterns emerged
 
-```
+````
 
 ---
 
@@ -1113,7 +1113,7 @@ After completing:
 
 **Reference:** superpowers `using-git-worktrees`
 
-```markdown
+````markdown
 ---
 name: using-worktrees
 description: Use when starting feature work that needs isolation - creates isolated git worktrees with safety verification
@@ -1268,7 +1268,7 @@ Ready to implement <feature-name>
 - **finishing-branch** - Cleanup worktree after work complete
 - **writing-plans** and **executing-plans** - Work happens in this worktree
 
-```
+````
 
 ---
 
@@ -1363,7 +1363,7 @@ When context is tight:
 
 **Reference:** ECC `architect.md`
 
-```markdown
+````markdown
 ---
 name: architect
 description: Software architecture specialist for system design, scalability, and technical decision-making. Use when planning new features or making architectural decisions.
@@ -1456,7 +1456,7 @@ Watch for these anti-patterns:
 - **Tight Coupling**: Components too dependent
 - **God Object**: One class does everything
 
-```
+````
 
 ---
 
@@ -1468,7 +1468,7 @@ Watch for these anti-patterns:
 
 **Reference:** ECC `planner.md`
 
-```markdown
+````markdown
 ---
 name: planner
 description: Planning specialist for breaking down complex features into actionable tasks
@@ -1585,7 +1585,7 @@ Expected: PASS
 - No testing strategy
 - Phases that can't be delivered independently
 
-```
+````
 
 ---
 
@@ -1597,7 +1597,7 @@ Expected: PASS
 
 **Reference:** ECC `tdd-guide.md`
 
-```markdown
+````markdown
 ---
 name: implementer
 description: Implementation specialist following strict TDD methodology
@@ -1676,7 +1676,7 @@ When complete, report:
 - Any issues encountered
 - Ready for review
 
-```
+````
 
 ---
 
@@ -1686,7 +1686,7 @@ When complete, report:
 
 **Responsibility:** Spec compliance check
 
-```markdown
+````markdown
 ---
 name: spec-reviewer
 description: Spec compliance reviewer - verifies implementation matches requirements
@@ -1748,7 +1748,7 @@ Required fixes before proceeding.
 - Extra features are violations, not bonuses
 - Don't suggest improvements, only report compliance
 
-```
+````
 
 ---
 
@@ -1760,7 +1760,7 @@ Required fixes before proceeding.
 
 **Reference:** superpowers `code-reviewer`
 
-```markdown
+````markdown
 ---
 name: code-reviewer
 description: Code quality reviewer for best practices, security, and maintainability
@@ -1849,7 +1849,7 @@ Suggestions (nice to have):
 - **Important**: Maintainability issue, missing error handling, poor performance
 - **Suggestion**: Style improvement, minor optimization
 
-```
+````
 
 ---
 
@@ -1859,7 +1859,7 @@ Suggestions (nice to have):
 
 **Responsibility:** TypeScript best practices review
 
-```markdown
+````markdown
 ---
 name: typescript-reviewer
 description: TypeScript specialist - reviews type safety and TS best practices
@@ -1910,7 +1910,7 @@ Check if applicable:
 }
 ```
 
-```
+````
 
 ---
 
@@ -1920,7 +1920,7 @@ Check if applicable:
 
 **Responsibility:** React patterns and hooks review
 
-```markdown
+````markdown
 ---
 name: react-reviewer
 description: React specialist - reviews component patterns and hooks usage
@@ -1969,7 +1969,7 @@ Check if applicable:
 }
 ```
 
-```
+````
 
 ---
 
@@ -1979,7 +1979,7 @@ Check if applicable:
 
 **Responsibility:** Code style and naming conventions review
 
-```markdown
+````markdown
 ---
 name: style-reviewer
 description: Style reviewer - checks naming conventions and code style
@@ -2032,7 +2032,7 @@ Read project CLAUDE.md for additional style rules:
 - Check for project-specific naming conventions
 - Check for required patterns (e.g., Tailwind tokens only)
 
-```
+````
 
 ---
 
@@ -2042,7 +2042,7 @@ Read project CLAUDE.md for additional style rules:
 
 **Responsibility:** Aggregate all reviewer results into final verdict
 
-```markdown
+````markdown
 ---
 name: review-aggregator
 description: Aggregates all reviewer outputs into final verdict and summary
@@ -2129,7 +2129,7 @@ Also output `final-review.md`:
 | style-reviewer | PASS | 1 nit |
 ```
 
-```
+````
 
 ---
 
@@ -2143,7 +2143,7 @@ Project expert agents are specialized agents that know a specific project's code
 
 **Responsibility:** Studio project expert - knows codebase patterns, conventions, and where to find similar implementations
 
-```markdown
+````markdown
 ---
 name: studio-expert
 description: Studio project expert - knows codebase patterns, conventions, and where to find similar implementations
@@ -2234,7 +2234,7 @@ Conventions to follow:
 - Exports: Use index.ts barrel files
 ```
 
-```
+````
 
 #### Creating New Project Experts
 
