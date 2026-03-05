@@ -48,82 +48,44 @@ original/ → generated/ → dist/ → publish
 | Release | `content/dist/` | Merged configs by locale |
 | Publish | picasso-assets / studio | CDN and frontend repos |
 
-## Execution Rules
-
-### Mandatory (MUST execute - never skip)
-
-#### Before ANY Modification
-
-```bash
-# MUST: Check if Studio schema has updates
-gh api repos/infinity-microsoft/studio/contents/src/schemas/labs-schemas.ts \
-  --jq '.content' | base64 -d | head -100
-```
-
-Compare with local `content/config.schema.json` and `content/metadata.schema.json`. If different, sync schema first.
-
-#### After ANY Modification
-
-```bash
-# MUST: Run integration tests
-npm run test:integration
-
-# If tests fail due to expected changes:
-npm run test:update-integration-baselines
-npm run test:integration  # Run again to verify
-```
-
-#### Before Publishing
-
-```bash
-# MUST: Find release branch (NEVER use main)
-gh api repos/infinity-microsoft/labs-content/branches --paginate \
-  --jq '.[] | select(.name | startswith("release/")) | .name' | tail -1
-```
-
-### Watch (blocks until complete)
-
-```bash
-# Watch workflow until complete
-gh run list --repo infinity-microsoft/labs-content --workflow "<workflow-name>" --limit 1 --json databaseId --jq '.[0].databaseId'
-gh run watch <run-id> --repo infinity-microsoft/labs-content
-```
-
-### Poll (ask user before checking)
-
-```bash
-# Check PR state
-gh pr view <pr-number> --repo <repo> --json state,mergedAt
-
-# If merged, continue. If not:
-# ASK: "PR #X is still open. Continue waiting? (yes/no)"
-```
-
 ## Complete Workflow
 
-| Step | Action | Type | State Indicator |
-|------|--------|------|-----------------|
-| 0 | **MUST** Check if Studio schema needs sync | Mandatory | - |
-| 1 | Collect info: what to update, new values | - | - |
-| 2 | Sync schema if needed | - | Local files changed |
-| 3 | Edit files based on user input | - | Local files changed |
-| 4 | **MUST** Run `npm run test:integration` | Mandatory | Tests pass |
-| 5 | Update baselines if needed | - | Tests pass |
-| 6 | Create branch, commit, push, create PR | - | PR open in labs-content |
-| 7 | Tell user PR URL, remind to merge ASAP | - | PR open |
-| 8 | **MUST** Watch Release workflow | Watch | Release branch exists |
-| **Staging** | | | |
-| 9 | **MUST** Trigger + Watch Publish: Staging | Watch | Staging workflow done |
-| 10 | Tell user picasso-assets staging PR URL | - | picasso staging PR open |
-| 11 | **ASK** user: "picasso staging PR merged?" | Poll | picasso staging PR merged |
-| 12 | Tell user to verify at <https://www.copilot-stg.com/labs> | - | User confirms |
-| 13 | Ask: "Staging verified. Publish to Production?" | - | User confirms |
-| **Production** | | | |
-| 14 | **MUST** Trigger + Watch Publish: Production | Watch | Production workflow done |
-| 15 | Tell user picasso-assets + studio PR URLs | - | picasso + studio PR open |
-| 16 | **ASK** user: "picasso production PR merged?" | Poll | picasso PR merged -> **Live** |
-| 17 | Tell user to verify at <https://www.copilot.microsoft.com/labs> | - | User confirms |
-| 18 | **ASK** user: "studio PR merged?" | Poll | studio PR merged |
+| Step | Action | State Indicator |
+|------|--------|-----------------|
+| 0 | Check if Studio schema needs sync | - |
+| 1 | Collect info: what to update, new values | - |
+| 2 | Sync schema if needed | Local files changed |
+| 3 | Edit files based on user input | Local files changed |
+| 4 | Run `npm run test:integration` | Tests pass |
+| 5 | Update baselines if needed | Tests pass |
+| 6 | Create branch, commit, push, create PR | PR open in labs-content |
+| 7 | Tell user PR URL, remind to merge | PR open |
+| 8 | Watch PR until merged (poll every 1 hour, auto-merge if approved) | PR merged |
+| 9 | Watch Release workflow until complete | Release branch exists |
+| **Staging** | | |
+| 10 | Trigger Publish: Staging | Staging workflow running |
+| 11 | Watch Staging workflow, tell user picasso-assets PR URL | Staging workflow done |
+| 12 | Watch picasso-assets PR until merged | picasso PR merged |
+| 13 | Tell user to verify at <https://www.copilot-stg.com/labs> | User confirms |
+| 14 | Ask: "Staging verified. Publish to Production?" | User confirms |
+| **Production** | | |
+| 15 | Trigger Publish: Production | Production workflow running |
+| 16 | Watch Production workflow (creates BOTH picasso PR + studio PR) | Production workflow done |
+| 17 | Watch picasso-assets PR (production) until merged | picasso PR merged -> **Live** |
+| 18 | Tell user to verify at <https://www.copilot.microsoft.com/labs> | User confirms |
+| 19 | Remind user to merge studio PR (i18n + fallback, can be async) | studio PR merged |
+
+### Watch PR / Workflow Commands
+
+```bash
+# Check PR state and auto-merge if ready
+gh pr view <pr-number> --repo <repo> --json state,mergedAt,reviewDecision,mergeable
+gh pr merge <pr-number> --repo <repo> --merge  # If approved + mergeable
+
+# Watch workflow until complete
+gh run list --repo <repo> --workflow "<workflow-name>" --limit 1 --json databaseId --jq '.[0].databaseId'
+gh run watch <run-id> --repo <repo>
+```
 
 ## Operations Reference
 
@@ -419,21 +381,13 @@ Update both `config.schema.json` and `metadata.schema.json`, then update affecte
 *_CRITICAL: Use release/_ branch, NOT main**
 
 ```bash
-# MUST: Find latest release branch first
+# Find latest release branch
 gh api repos/infinity-microsoft/labs-content/branches --paginate \
   --jq '.[] | select(.name | startswith("release/")) | .name' | tail -1
 
-# Trigger and MUST watch until complete
+# Trigger workflows
 gh workflow run "Publish: Staging" --repo infinity-microsoft/labs-content --ref release/YYYY-MM-DD-HHMMSS
-# Then immediately:
-gh run list --repo infinity-microsoft/labs-content --workflow "Publish: Staging" --limit 1 --json databaseId --jq '.[0].databaseId'
-gh run watch <run-id> --repo infinity-microsoft/labs-content
-
-# After staging PR merged and verified:
 gh workflow run "Publish: Production" --repo infinity-microsoft/labs-content --ref release/YYYY-MM-DD-HHMMSS
-# Then immediately:
-gh run list --repo infinity-microsoft/labs-content --workflow "Publish: Production" --limit 1 --json databaseId --jq '.[0].databaseId'
-gh run watch <run-id> --repo infinity-microsoft/labs-content
 ```
 
 | Environment | Publishes To |
@@ -495,35 +449,28 @@ gh workflow run "Publish: Staging" --repo infinity-microsoft/labs-content --ref 
 
 ## Checklist
 
-### Before Modification (Mandatory)
-
-- [ ] **MUST** Check Studio schema for updates
-- [ ] Sync schema if different
-
 ### Local Development
 
 - [ ] Create feature branch
 - [ ] Update files (metadata.json, landing-page.md, schema if needed)
-- [ ] **MUST** Run `npm run test:integration`
+- [ ] Run `npm run test:integration`
 - [ ] Update baselines if needed
 
 ### PR & Release
 
 - [ ] Commit and create PR
-- [ ] Tell user to merge PR ASAP
-- [ ] **MUST** Watch Release workflow until complete
+- [ ] Wait for PR merge
+- [ ] Find release branch
 
 ### Staging
 
-- [ ] **MUST** Trigger Publish: Staging + Watch until complete
-- [ ] Tell user picasso staging PR URL
-- [ ] **ASK** user if picasso staging PR is merged
-- [ ] Tell user to verify at <https://www.copilot-stg.com/labs>
+- [ ] Trigger Publish: Staging
+- [ ] Wait for picasso PR merge
+- [ ] Verify at <https://www.copilot-stg.com/labs>
 
 ### Production
 
-- [ ] **MUST** Trigger Publish: Production + Watch until complete
-- [ ] Tell user picasso + studio PR URLs
-- [ ] **ASK** user if picasso production PR is merged -> **Live**
-- [ ] Tell user to verify at <https://www.copilot.microsoft.com/labs>
-- [ ] **ASK** user if studio PR is merged (can be async)
+- [ ] Trigger Publish: Production
+- [ ] Wait for picasso PR merge -> Live
+- [ ] Verify at <https://www.copilot.microsoft.com/labs>
+- [ ] Merge studio PR (can be async)
