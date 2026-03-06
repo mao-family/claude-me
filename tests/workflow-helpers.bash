@@ -30,6 +30,20 @@ assert_not_contains() {
   fi
 }
 
+# Assert output contains at least one of the keywords
+assert_contains_any() {
+  local output="$1"
+  shift
+  for keyword in "$@"; do
+    if [[ "${output}" == *"${keyword}"* ]]; then
+      return 0
+    fi
+  done
+  echo "Expected output to contain one of: $*"
+  echo "Actual output: ${output}"
+  return 1
+}
+
 # Setup test project directory
 setup_test_project() {
   local name="$1"
