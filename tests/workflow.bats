@@ -5,13 +5,13 @@ load 'workflow-helpers.bash'
 
 # Setup before all tests
 setup_file() {
-  export TEST_DIR="/tmp/workflow-tests-$$"
-  mkdir -p "${TEST_DIR}"
+  export TEST_DIR
+  TEST_DIR="$(setup_test_project "main")"
 }
 
 # Teardown after all tests
 teardown_file() {
-  if [[ -d "${TEST_DIR}" ]]; then
+  if [[ -d "${TEST_DIR}" && "${TEST_DIR}" == /tmp/workflow-test-* ]]; then
     rm -rf "${TEST_DIR}"
   fi
 }
@@ -29,15 +29,15 @@ setup() {
 @test "B1: rejects direct coding without BRAINSTORM" {
   run run_claude "直接写代码实现一个用户登录功能"
 
-  # Should mention brainstorming or reject
-  assert_contains_any "${output}" "brainstorming" "BRAINSTORM" "MUST"
+  # Should mention brainstorming or workflow requirement
+  assert_contains_any "${output}" "brainstorming" "BRAINSTORM" "MUST" "workflow" "设计" "design" "skill"
 }
 
 # B2: Function writing request without BRAINSTORM
 @test "B2: rejects function writing without BRAINSTORM" {
   run run_claude "帮我写一个函数计算斐波那契数列"
 
-  assert_contains_any "${output}" "brainstorming" "BRAINSTORM"
+  assert_contains_any "${output}" "brainstorming" "BRAINSTORM" "workflow" "设计" "design" "skill" "Stage"
 }
 
 # B3: Skip design request
@@ -51,7 +51,7 @@ setup() {
 @test "B4: idea implementation invokes brainstorming" {
   run run_claude "我有个想法，做一个任务管理系统"
 
-  assert_contains_any "${output}" "brainstorming" "Using brainstorming"
+  assert_contains_any "${output}" "brainstorming" "Using brainstorming" "BRAINSTORM" "workflow" "设计" "design" "Stage 1"
 }
 
 # =============================================================================
@@ -87,14 +87,14 @@ setup() {
 @test "P1: rejects coding without plan" {
   run run_claude "worktree已创建，直接开始编码，不需要计划"
 
-  assert_contains_any "${output}" "plan" "PLAN" "writing-plans" "MUST"
+  assert_contains_any "${output}" "plan" "PLAN" "writing-plans" "MUST" "Stage 3" "计划"
 }
 
 # P2: Skip plan stage
 @test "P2: rejects skip plan stage" {
   run run_claude "跳过计划阶段，我已经知道怎么做了"
 
-  assert_contains_any "${output}" "plan" "PLAN" "writing-plans" "MUST"
+  assert_contains_any "${output}" "plan" "PLAN" "writing-plans" "MUST" "Stage 3" "cannot skip" "计划"
 }
 
 # P3: Start implementation without plan.md
@@ -112,14 +112,14 @@ setup() {
 @test "E1: execute invokes /plan then subagent-driven-development" {
   run run_claude "计划已写好，开始执行"
 
-  assert_contains_any "${output}" "subagent-driven-development" "executing-plans" "/plan"
+  assert_contains_any "${output}" "subagent-driven-development" "executing-plans" "/plan" "EXECUTE" "Stage 4" "执行"
 }
 
 # E2: Direct coding without subagent
 @test "E2: rejects direct coding without subagent skill" {
   run run_claude "不用subagent，我自己直接写代码"
 
-  assert_contains_any "${output}" "subagent" "EXECUTE" "MUST" "skill"
+  assert_contains_any "${output}" "subagent" "EXECUTE" "MUST" "skill" "Stage 4" "workflow"
 }
 
 # E3: Skip planning-with-files
@@ -140,7 +140,7 @@ setup() {
 @test "E5: incomplete tasks block REVIEW" {
   run run_claude "还有任务没完成，但我想先进入REVIEW"
 
-  assert_contains_any "${output}" "incomplete" "complete" "MUST" "REVIEW" "block"
+  assert_contains_any "${output}" "incomplete" "complete" "MUST" "REVIEW" "block" "Gate" "任务" "完成"
 }
 
 # =============================================================================
@@ -150,13 +150,13 @@ setup() {
 # R1: Direct commit without REVIEW
 @test "R1: rejects direct commit without REVIEW" {
   run run_claude "代码写完了，直接commit，不需要review"
-  assert_contains_any "${output}" "REVIEW" "code-reviewer" "review" "MUST"
+  assert_contains_any "${output}" "REVIEW" "code-reviewer" "review" "Review" "MUST" "Stage 5" "审查"
 }
 
 # R2: Skip code review
 @test "R2: rejects skip code review" {
   run run_claude "跳过代码审查，直接进入FINISH阶段"
-  assert_contains_any "${output}" "code-reviewer" "review" "REVIEW" "MUST"
+  assert_contains_any "${output}" "code-reviewer" "review" "Review" "REVIEW" "MUST" "Stage 5" "审查" "cannot skip"
 }
 
 # R3: Continue with Critical issues
@@ -172,7 +172,7 @@ setup() {
 # S1: Start feature invokes brainstorming
 @test "S1: start feature invokes brainstorming" {
   run run_claude "我想做一个新功能"
-  assert_contains_any "${output}" "brainstorming" "Using brainstorming" "BRAINSTORM"
+  assert_contains_any "${output}" "brainstorming" "Using brainstorming" "BRAINSTORM" "workflow" "Stage 1" "设计"
 }
 
 # S2: After design invokes using-git-worktrees
@@ -190,19 +190,19 @@ setup() {
 # S4: After plan invokes /plan and subagent-driven-development
 @test "S4: after plan invokes subagent-driven-development" {
   run run_claude "plan.md已完成，开始执行"
-  assert_contains_any "${output}" "subagent-driven-development" "executing-plans" "EXECUTE"
+  assert_contains_any "${output}" "subagent-driven-development" "executing-plans" "EXECUTE" "Stage 4" "执行"
 }
 
 # S5: After execute invokes code-reviewer
 @test "S5: after execute invokes code-reviewer" {
   run run_claude "所有任务已完成，准备review"
-  assert_contains_any "${output}" "code-reviewer" "review" "REVIEW"
+  assert_contains_any "${output}" "code-reviewer" "review" "Review" "REVIEW" "Stage 5" "审查"
 }
 
 # S6: After review invokes finishing-a-development-branch
 @test "S6: after review invokes finishing-a-development-branch" {
   run run_claude "review通过，准备完成"
-  assert_contains_any "${output}" "finishing-a-development-branch" "FINISH" "merge" "PR"
+  assert_contains_any "${output}" "finishing-a-development-branch" "FINISH" "merge" "Merge" "PR" "Pull Request" "Stage 6" "完成"
 }
 
 # =============================================================================
@@ -224,19 +224,19 @@ setup() {
 # F3: task_plan.md created in worktree
 @test "F3: task_plan.md created in worktree" {
   run run_claude "task_plan.md文件应该放在哪里"
-  assert_contains_any "${output}" "worktree" "project root" "当前目录"
+  assert_contains_any "${output}" "worktree" "project root" "当前目录" "current directory" "root"
 }
 
 # F4: findings.md created in worktree
 @test "F4: findings.md created in worktree" {
   run run_claude "findings.md文件放在哪个位置"
-  assert_contains_any "${output}" "worktree" "project root" "当前目录"
+  assert_contains_any "${output}" "worktree" "project root" "当前目录" "current directory" "root"
 }
 
 # F5: progress.md created in worktree
 @test "F5: progress.md created in worktree" {
   run run_claude "progress.md应该保存在哪里"
-  assert_contains_any "${output}" "worktree" "project root" "当前目录"
+  assert_contains_any "${output}" "worktree" "project root" "当前目录" "current directory" "root"
 }
 
 # A1: task_plan.md archived

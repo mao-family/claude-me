@@ -65,8 +65,68 @@ setup_test_project() {
   mkdir -p "${dir}"
   cd "${dir}" || return 1
   git init
+
+  # Create CLAUDE.md with workflow rules so Claude knows the constraints
+  cat > CLAUDE.md << 'CLAUDE_EOF'
+# Test Project
+
+## Mandatory Workflow
+
+**ALL feature development MUST follow superpowers workflow:**
+
+```text
+BRAINSTORM → WORKTREE → PLAN → EXECUTE → REVIEW → FINISH
+     1           2         3        4         5        6
+```
+
+## Key Constraints
+
+### Stage 1: BRAINSTORM
+- **MUST** invoke `brainstorming` skill before any coding
+- **Gate**: Design approved, feature branch created
+
+### Stage 2: WORKTREE
+- **MUST** invoke `using-git-worktrees` skill
+- **Gate**: Worktree created for isolation
+
+### Stage 3: PLAN
+- **MUST** invoke `writing-plans` skill
+- **Gate**: plan.md saved and approved
+
+### Stage 4: EXECUTE
+- **MUST** run `/plan` to initialize planning-with-files
+- **MUST** invoke `subagent-driven-development` skill
+- **Gate**: All tasks complete
+
+### Stage 5: REVIEW
+- **MUST** invoke `code-reviewer` agent
+- **Gate**: All Critical issues fixed
+
+### Stage 6: FINISH
+- **MUST** invoke `finishing-a-development-branch` skill
+- Options: merge locally, create PR, keep as-is, discard
+- **Gate**: Merge/PR done, files archived, worktree cleaned
+
+## File Locations
+
+| File | Location |
+|------|----------|
+| design.md | `memory-bank/{project}/features/{name}/` |
+| plan.md | `memory-bank/{project}/features/{name}/` |
+| task_plan.md | worktree root (current directory) |
+| findings.md | worktree root (current directory) |
+| progress.md | worktree root (current directory) |
+
+## Rules
+
+- Cannot skip stages
+- Cannot proceed without completing gate requirements
+- Critical review issues block FINISH stage
+- Each task uses fresh subagent
+CLAUDE_EOF
+
   echo "# Test Project" > README.md
-  git add README.md
+  git add README.md CLAUDE.md
   git commit -m "init"
   echo "${dir}"
 }
