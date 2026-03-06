@@ -171,32 +171,38 @@ setup() {
 
 # S1: Start feature invokes brainstorming
 @test "S1: start feature invokes brainstorming" {
-  skip "TODO: implement"
+  run run_claude "我想做一个新功能"
+  assert_contains_any "${output}" "brainstorming" "Using brainstorming" "BRAINSTORM"
 }
 
 # S2: After design invokes using-git-worktrees
 @test "S2: after design invokes using-git-worktrees" {
-  skip "TODO: implement"
+  run run_claude "设计已批准，准备开始实现"
+  assert_contains_any "${output}" "using-git-worktrees" "worktree" "WORKTREE"
 }
 
 # S3: After worktree invokes writing-plans
 @test "S3: after worktree invokes writing-plans" {
-  skip "TODO: implement"
+  run run_claude "worktree已创建，下一步是什么"
+  assert_contains_any "${output}" "writing-plans" "plan" "PLAN"
 }
 
 # S4: After plan invokes /plan and subagent-driven-development
 @test "S4: after plan invokes subagent-driven-development" {
-  skip "TODO: implement"
+  run run_claude "plan.md已完成，开始执行"
+  assert_contains_any "${output}" "subagent-driven-development" "executing-plans" "EXECUTE"
 }
 
 # S5: After execute invokes code-reviewer
 @test "S5: after execute invokes code-reviewer" {
-  skip "TODO: implement"
+  run run_claude "所有任务已完成，准备review"
+  assert_contains_any "${output}" "code-reviewer" "review" "REVIEW"
 }
 
 # S6: After review invokes finishing-a-development-branch
 @test "S6: after review invokes finishing-a-development-branch" {
-  skip "TODO: implement"
+  run run_claude "review通过，准备完成"
+  assert_contains_any "${output}" "finishing-a-development-branch" "FINISH" "merge" "PR"
 }
 
 # =============================================================================
