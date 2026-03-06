@@ -2,10 +2,24 @@
 # Helper functions for workflow tests
 
 # Run claude with timeout and capture output
+# Uses gtimeout on macOS (coreutils), timeout on Linux
 run_claude() {
   local prompt="$1"
-  local timeout="${2:-120}"
-  timeout "${timeout}" claude --print "${prompt}" 2>&1
+  local timeout_sec="${2:-120}"
+
+  # Find timeout command (gtimeout on macOS, timeout on Linux)
+  local timeout_cmd=""
+  if command -v gtimeout > /dev/null 2>&1; then
+    timeout_cmd="gtimeout"
+  elif command -v timeout > /dev/null 2>&1; then
+    timeout_cmd="timeout"
+  else
+    # Fallback: run without timeout
+    claude --print "${prompt}" 2>&1
+    return
+  fi
+
+  "${timeout_cmd}" "${timeout_sec}" claude --print "${prompt}" 2>&1
 }
 
 # Assert output contains keyword
