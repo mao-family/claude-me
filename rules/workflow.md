@@ -1,45 +1,63 @@
 # Workflow Rules
 
-## Development Flow
+## Mandatory Workflow
 
-Follow superpowers workflow for all feature development:
+**ALL feature development MUST follow this exact sequence:**
 
 ```text
-BRAINSTORM → PLAN → EXECUTE → FINISH
+BRAINSTORM → WORKTREE → PLAN → EXECUTE → FINISH
+     1           2         3        4         5
 ```
 
-## Before Execution
+## Stage Requirements
 
-**When user approves a plan, BEFORE starting execution:**
+| # | Stage | Skill | Gate |
+|---|-------|-------|------|
+| 1 | BRAINSTORM | `brainstorming` | Design doc saved |
+| 2 | WORKTREE | `using-git-worktrees` | Worktree created |
+| 3 | PLAN | `writing-plans` | plan.md saved |
+| 4 | EXECUTE | `subagent-driven-development` | All tasks complete |
+| 5 | FINISH | `finishing-a-development-branch` | Merge/PR done |
+
+**Gate = Must be satisfied before proceeding to next stage.**
+
+## Forbidden Actions
+
+| Action | Why Forbidden |
+|--------|---------------|
+| Code before PLAN complete | No plan.md = no coding |
+| Skip WORKTREE | Must isolate feature work |
+| Execute without skill | Must invoke `subagent-driven-development` |
+| Commit without FINISH skill | Must use `finishing-a-development-branch` |
+| Skip any stage | All 5 stages are mandatory |
+
+## Context Management (Before EXECUTE)
+
+**MUST** run `/plan` before EXECUTE stage:
 
 1. Run `/plan` to initialize planning-with-files
-2. This creates: `task_plan.md`, `findings.md`, `progress.md`
+2. Creates: `task_plan.md`, `findings.md`, `progress.md`
 3. Ask user: **Supervised or Autonomous?**
 
-## Execution Mode Selection
+## Execution Mode (Stage 4)
 
-**Recommend Subagent-Driven** (superpowers:subagent-driven-development)
+| Mode | How | When |
+|------|-----|------|
+| **Supervised** | Invoke `subagent-driven-development` directly | User present |
+| **Autonomous** | Use `/ralph-loop` (see below) | User away |
 
-| Level | Description |
-|-------|-------------|
-| **Supervised** | Claude may ask questions, user reviews progress |
-| **Autonomous** | No questions, auto-decide, unattended execution |
-
-### Supervised Mode
-
-Proceed with `subagent-driven-development` directly.
-
-### Autonomous Mode (ralph-loop)
+### Autonomous Mode Command
 
 ```text
 /ralph-loop "Execute the plan using subagent-driven-development skill. Do NOT ask questions - make reasonable decisions and proceed. When ALL tasks complete, output: <promise>ALL_TASKS_COMPLETE</promise>" --max-iterations 50 --completion-promise "ALL_TASKS_COMPLETE"
 ```
 
-**After loop completes:** User returns for FINISH stage (merge/PR choice)
+## Stage Checklist
 
-## Checkpoint
+Before proceeding to next stage, verify:
 
-Before marking execution complete, verify:
-
-- [ ] All tasks in plan.md marked complete
-- [ ] All phases in task_plan.md marked complete
+- [ ] **BRAINSTORM**: Design doc committed to `docs/plans/`
+- [ ] **WORKTREE**: Working in isolated worktree
+- [ ] **PLAN**: plan.md committed to `docs/plans/`
+- [ ] **EXECUTE**: All tasks in plan.md marked complete
+- [ ] **FINISH**: Merge/PR complete, worktree cleaned up
