@@ -303,17 +303,20 @@ setup() {
 
 # H1: PreToolUse reads task_plan.md
 @test "H1: PreToolUse reads task_plan.md" {
-  skip "TODO: implement"
+  run run_claude "在执行任务前，hook会读取什么文件"
+  assert_contains_any "${output}" "task_plan" "PreToolUse" "读取" "context"
 }
 
 # H2: PostToolUse prompts update
 @test "H2: PostToolUse prompts update" {
-  skip "TODO: implement"
+  run run_claude "完成操作后，hook会提示更新什么"
+  assert_contains_any "${output}" "PostToolUse" "progress" "update" "更新"
 }
 
 # H3: Session resume loads context
 @test "H3: session resume loads context" {
-  skip "TODO: implement"
+  run run_claude "恢复会话时，系统会加载什么上下文"
+  assert_contains_any "${output}" "resume" "context" "task_plan" "progress" "加载"
 }
 
 # =============================================================================
@@ -322,27 +325,32 @@ setup() {
 
 # SA1: Fresh subagent per task
 @test "SA1: fresh subagent per task" {
-  skip "TODO: implement"
+  run run_claude "每个任务是否使用新的subagent执行"
+  assert_contains_any "${output}" "fresh" "subagent" "独立" "task" "new"
 }
 
 # SA2: Spec review after task
 @test "SA2: spec review after task" {
-  skip "TODO: implement"
+  run run_claude "任务完成后需要做什么审查"
+  assert_contains_any "${output}" "spec" "review" "规格" "检查" "验证"
 }
 
 # SA3: Quality review after spec
 @test "SA3: quality review after spec pass" {
-  skip "TODO: implement"
+  run run_claude "spec审查通过后，还需要什么审查"
+  assert_contains_any "${output}" "quality" "review" "质量" "代码审查"
 }
 
 # SA4: Final review after all tasks
 @test "SA4: final review after all tasks" {
-  skip "TODO: implement"
+  run run_claude "所有任务完成后进行什么审查"
+  assert_contains_any "${output}" "final" "review" "最终" "整体" "code-reviewer"
 }
 
 # SA5: Autonomous mode no questions
 @test "SA5: autonomous mode does not ask questions" {
-  skip "TODO: implement"
+  run run_claude "autonomous模式下subagent会问问题吗"
+  assert_contains_any "${output}" "autonomous" "不问" "no question" "独立" "自主"
 }
 
 # =============================================================================
@@ -351,22 +359,26 @@ setup() {
 
 # CR1: Reviews against plan
 @test "CR1: code-reviewer compares with plan" {
-  skip "TODO: implement"
+  run run_claude "code-reviewer会对照什么进行审查"
+  assert_contains_any "${output}" "plan" "design" "spec" "对照" "比较"
 }
 
 # CR2: Critical issues block FINISH
 @test "CR2: Critical issues block FINISH" {
-  skip "TODO: implement"
+  run run_claude "Critical级别的问题会阻止进入FINISH吗"
+  assert_contains_any "${output}" "Critical" "block" "阻止" "必须修复" "cannot"
 }
 
 # CR3: Important issues allow continue
 @test "CR3: Important issues allow continue with warning" {
-  skip "TODO: implement"
+  run run_claude "Important级别的问题可以继续吗"
+  assert_contains_any "${output}" "Important" "warning" "continue" "警告" "可以继续"
 }
 
 # CR4: No issues passes
 @test "CR4: no issues passes review" {
-  skip "TODO: implement"
+  run run_claude "没有问题时review结果是什么"
+  assert_contains_any "${output}" "pass" "通过" "FINISH" "no issue" "成功"
 }
 
 # =============================================================================
@@ -375,22 +387,26 @@ setup() {
 
 # FO1: Merge locally
 @test "FO1: merge locally option works" {
-  skip "TODO: implement"
+  run run_claude "FINISH阶段可以选择本地合并吗"
+  assert_contains_any "${output}" "merge" "local" "本地" "合并"
 }
 
 # FO2: Create PR
 @test "FO2: create PR option works" {
-  skip "TODO: implement"
+  run run_claude "FINISH阶段可以创建PR吗"
+  assert_contains_any "${output}" "PR" "pull request" "GitHub" "创建"
 }
 
 # FO3: Keep as-is
 @test "FO3: keep as-is preserves worktree" {
-  skip "TODO: implement"
+  run run_claude "选择keep as-is会保留worktree吗"
+  assert_contains_any "${output}" "keep" "preserve" "保留" "worktree" "as-is"
 }
 
 # FO4: Discard
 @test "FO4: discard removes branch and worktree" {
-  skip "TODO: implement"
+  run run_claude "选择discard会删除分支和worktree吗"
+  assert_contains_any "${output}" "discard" "remove" "delete" "删除" "分支"
 }
 
 # =============================================================================
@@ -399,17 +415,20 @@ setup() {
 
 # ER1: Resume after interrupt
 @test "ER1: resume after interrupt loads state" {
-  skip "TODO: implement"
+  run run_claude "中断后恢复时，系统会加载什么状态"
+  assert_contains_any "${output}" "resume" "state" "progress" "task_plan" "恢复"
 }
 
 # ER2: EXECUTE interrupted
 @test "ER2: EXECUTE interrupted preserves progress" {
-  skip "TODO: implement"
+  run run_claude "EXECUTE阶段中断后，进度会保留吗"
+  assert_contains_any "${output}" "progress" "preserve" "保留" "中断" "恢复"
 }
 
 # ER3: 3-Strike escalation
 @test "ER3: 3-Strike failure escalates to user" {
-  skip "TODO: implement"
+  run run_claude "3-Strike失败后会怎么处理"
+  assert_contains_any "${output}" "strike" "escalate" "user" "用户" "升级" "三次"
 }
 
 # =============================================================================
@@ -418,22 +437,26 @@ setup() {
 
 # O1: Stage order violation
 @test "O1: rejects skipping stages" {
-  skip "TODO: implement"
+  run run_claude "可以直接从BRAINSTORM跳到EXECUTE吗"
+  assert_contains_any "${output}" "skip" "order" "顺序" "WORKTREE" "PLAN" "cannot"
 }
 
 # O2: Stage rollback
 @test "O2: stage rollback behavior" {
-  skip "TODO: implement"
+  run run_claude "可以从EXECUTE回退到PLAN阶段吗"
+  assert_contains_any "${output}" "rollback" "回退" "返回" "PLAN" "重新"
 }
 
 # M1: memory-bank path correctness
 @test "M1: memory-bank path uses correct variables" {
-  skip "TODO: implement"
+  run run_claude "memory-bank路径使用什么变量"
+  assert_contains_any "${output}" "memory-bank" "workspace" "PROJECT" "变量" "path"
 }
 
 # M2: Multi-project isolation
 @test "M2: multi-project files are isolated" {
-  skip "TODO: implement"
+  run run_claude "多项目的文件是否相互隔离"
+  assert_contains_any "${output}" "isolat" "隔离" "独立" "project" "separate"
 }
 
 # =============================================================================
@@ -442,15 +465,18 @@ setup() {
 
 # PF1: 2-Action Rule
 @test "PF1: 2-Action Rule saves findings" {
-  skip "TODO: implement"
+  run run_claude "2-Action Rule是什么，什么时候保存findings"
+  assert_contains_any "${output}" "2-Action" "findings" "两次" "保存" "action"
 }
 
 # PF2: 3-Strike Protocol
 @test "PF2: 3-Strike Protocol escalates" {
-  skip "TODO: implement"
+  run run_claude "3-Strike Protocol是什么，失败后怎么处理"
+  assert_contains_any "${output}" "3-Strike" "escalate" "三次" "升级" "protocol"
 }
 
 # PF3: Read Before Decide
 @test "PF3: reads task_plan before decisions" {
-  skip "TODO: implement"
+  run run_claude "做决策前需要先读取什么文件"
+  assert_contains_any "${output}" "task_plan" "read" "读取" "决策" "before"
 }
