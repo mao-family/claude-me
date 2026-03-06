@@ -9,62 +9,46 @@ BRAINSTORM → WORKTREE → PLAN → EXECUTE → REVIEW → FINISH
      1           2         3        4         5        6
 ```
 
-## Stage Requirements
-
-| # | Stage | Skill/Agent | Gate |
-|---|-------|-------------|------|
-| 1 | BRAINSTORM | `brainstorming` | Design approved, feature branch created |
-| 2 | WORKTREE | `using-git-worktrees` | Worktree created |
-| 3 | PLAN | `writing-plans` | plan.md saved |
-| 4 | EXECUTE | `subagent-driven-development` | All tasks complete |
-| 5 | REVIEW | `code-reviewer` agent | Review passed |
-| 6 | FINISH | `finishing-a-development-branch` | Merge/PR done, files archived |
-
-**Gate = Must be satisfied before proceeding to next stage.**
-
-## Forbidden Actions
-
-| Action | Why Forbidden |
-|--------|---------------|
-| Code before PLAN complete | No plan.md = no coding |
-| Skip feature branch | Must create feature branch after BRAINSTORM |
-| Skip WORKTREE | Must isolate feature work |
-| Execute without skill | Must invoke `subagent-driven-development` |
-| Skip REVIEW | Must use `code-reviewer` agent after EXECUTE |
-| Skip FINISH skill | Must use `finishing-a-development-branch` |
-| Skip any stage | All 6 stages are mandatory |
-
 ## Key Constraints
 
-### After BRAINSTORM Approval
+### Stage 1: BRAINSTORM
 
-1. Create feature branch: `git checkout -b feature/{name}`
-2. Save design.md to: `workspace/memory-bank/{project}/features/{name}/`
-3. Commit
+- **MUST** invoke `brainstorming` skill
+- **Gate**: Design approved, feature branch created
+- After approval: Create `feature/{name}` branch, save design.md to `memory-bank/{project}/features/{name}/`
 
-### After PLAN Approval
+### Stage 2: WORKTREE
 
-1. Save plan.md to: `workspace/memory-bank/{project}/features/{name}/`
-2. Commit
+- **MUST** invoke `using-git-worktrees` skill
+- **Gate**: Worktree created
 
-### Before EXECUTE
+### Stage 3: PLAN
 
-**MUST** run `/plan` to initialize planning-with-files.
+- **MUST** invoke `writing-plans` skill
+- **Gate**: plan.md saved
+- After approval: Save plan.md to `memory-bank/{project}/features/{name}/`
 
-### Execution Mode
+### Stage 4: EXECUTE
+
+- **MUST** run `/plan` to initialize planning-with-files
+- **MUST** invoke `subagent-driven-development` skill
+- **Gate**: All tasks complete
 
 | Mode | How |
 |------|-----|
 | Supervised | Invoke `subagent-driven-development` directly |
 | Autonomous | `/ralph-loop` with `subagent-driven-development` |
 
-### After EXECUTE
+### Stage 5: REVIEW
 
-**MUST** invoke `code-reviewer` agent. All Critical issues must be fixed.
+- **MUST** invoke `code-reviewer` agent
+- **Gate**: All Critical issues fixed
 
-### After FINISH
+### Stage 6: FINISH
 
-**MUST** archive planning-with-files to `memory-bank/{project}/features/{name}/`.
+- **MUST** invoke `finishing-a-development-branch` skill
+- **MUST** archive planning-with-files to `memory-bank/{project}/features/{name}/`
+- **Gate**: Merge/PR done, files archived, worktree cleaned
 
 ## Stage Checklist
 
