@@ -13,6 +13,8 @@ skills/
 │   └── SKILL.md                   # Copilot Labs content management
 ├── managing-workspace/
 │   └── SKILL.md                   # Workspace repo management
+├── notebooklm/
+│   └── SKILL.md                   # NotebookLM automation (requires external CLI)
 ├── research/
 │   └── SKILL.md                   # Systematic research workflow
 └── writing-claude-md/
@@ -20,6 +22,19 @@ skills/
 ```
 
 ## Changelog
+
+### notebooklm
+
+| Date | Change |
+|------|--------|
+| 2026-03-07 | Initial setup - full programmatic access to Google NotebookLM |
+
+**Dependencies:** Requires `notebooklm-py` CLI tool.
+
+```bash
+pipx install "notebooklm-py[browser]"
+notebooklm login  # First-time authentication
+```
 
 ### labs-content-update
 

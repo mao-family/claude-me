@@ -16,11 +16,6 @@ echo 'eval "$(fnm env)"' >> ~/.zshrc && source ~/.zshrc
 fnm install --lts && fnm use --lts
 npm install -g @anthropic-ai/claude-code
 
-# Configure GitHub tokens in ~/.zshrc
-gh auth login
-export GITHUB_TOKEN_PERSONAL=""  # https://github.com/settings/tokens
-export GITHUB_TOKEN_WORK=$(gh auth token)
-
 # Install
 git clone https://github.com/mao-family/claude-me.git ~/Repos/claude-me
 cd ~/Repos/claude-me && bun run install
