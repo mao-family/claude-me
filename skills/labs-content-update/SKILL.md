@@ -192,53 +192,78 @@ gh api repos/infinity-microsoft/labs-content/branches --paginate \
   --jq '.[] | select(.name | startswith("release/")) | .name' | tail -10
 ```
 
-#### Step 2: For Each Release Branch, Build Complete Tracking Chain
+#### Step 2: For Each Release Branch, Check Workflow Status
 
-Each release branch represents one update. Track its full pipeline:
+**CRITICAL: Check workflow status FIRST before looking for PRs.**
 
 ```bash
-# 1. Find the labs-content PR that created this release
-#    Release branch timestamp indicates when PR was merged
-#    Example: release/2026-02-26-091642 -> PR merged around 2026-02-26 09:16
+# 1. Find Staging workflow runs for this release branch
+gh run list --repo infinity-microsoft/labs-content \
+  --workflow "Publish: Staging" --branch release/YYYY-MM-DD-HHMMSS --limit 1 \
+  --json databaseId,conclusion,status
 
-# 2. Find associated picasso-assets PRs by searching title and checking files
-gh pr list --repo infinity-microsoft/picasso-assets --state all --search "labs" --limit 20 \
-  --json number,title,state,mergedAt,createdAt
-
-# 3. For each picasso PR, check if it's staging or production
-gh pr view <pr-number> --repo infinity-microsoft/picasso-assets --json files --jq '.files[].path'
-# staging.config.json -> Staging PR
-# prod.config.json -> Production PR
-
-# 4. Find associated studio PRs (created by Production workflow)
-gh pr list --repo infinity-microsoft/studio --state all --search "labs markdown" --limit 10 \
-  --json number,title,state,mergedAt,createdAt
+# 2. Find Production workflow runs for this release branch
+gh run list --repo infinity-microsoft/labs-content \
+  --workflow "Publish: Production" --branch release/YYYY-MM-DD-HHMMSS --limit 1 \
+  --json databaseId,conclusion,status
 ```
 
-#### Step 3: Correlate PRs to Release Branches by Timestamp
+| Workflow | Conclusion | Meaning |
+|----------|------------|---------|
+| Staging | success | picasso staging PR created |
+| Staging | failure | Check logs for error |
+| Production | success | picasso prod PR + studio PR created |
+| Production | failure | **Check logs** - picasso PR may exist but studio PR missing |
 
-| Release Branch | Staging PR | Production PR | Studio PR |
-|----------------|------------|---------------|-----------|
-| release/2026-02-26-... | Created ~same day | Created after staging merged | Created by prod workflow |
-| release/2026-03-02-... | Created ~same day | Created after staging merged | Created by prod workflow |
+#### Step 3: If Workflow Failed, Check Logs
 
-**Key insight:** PRs are created sequentially:
+```bash
+# Get failure details
+gh run view <run-id> --repo infinity-microsoft/labs-content --log 2>&1 | tail -50
 
-1. Release branch created (auto, on PR merge)
-2. Staging workflow triggered -> picasso staging PR
-3. After staging merged -> Production workflow triggered -> picasso prod PR + studio PR
+# Common failure: authentication error when pushing to studio
+# "fatal: could not read Username for 'https://github.com'"
+# This means: picasso PR created, but studio PR NOT created
+```
 
-#### Step 4: Determine Status for Each Update
+#### Step 4: Find PRs from Workflow Logs (if successful)
 
-For each release branch, check:
+```bash
+# Extract PR links from successful workflow logs
+gh run view <run-id> --repo infinity-microsoft/labs-content --log 2>&1 | grep -i "github.com.*pull"
+
+# Example output:
+# https://github.com/infinity-microsoft/picasso-assets/pull/143
+# https://github.com/infinity-microsoft/studio/pull/23024
+```
+
+#### Step 5: Alternative - Find PRs by Branch Name
+
+If workflow logs unavailable, search by branch naming convention:
+
+```bash
+# Staging workflow creates branch: copilotlabs-staging-config/YYYY-MM-DD-HHMMSS
+gh pr list --repo infinity-microsoft/picasso-assets --state all \
+  --head "copilotlabs-staging-config/2026-02-27" --json number,state
+
+# Production workflow creates branches:
+# - copilotlabs-prod-config/YYYY-MM-DD-HHMMSS (picasso)
+# - copilotlabs-production/YYYY-MM-DD-HHMMSS (studio)
+gh pr list --repo infinity-microsoft/picasso-assets --state all \
+  --head "copilotlabs-prod-config/2026-02-27" --json number,state
+gh pr list --repo infinity-microsoft/studio --state all \
+  --head "copilotlabs-production/2026-02-27" --json number,state
+```
+
+#### Step 6: Determine Status for Each Update
 
 | Check | Command | Status |
 |-------|---------|--------|
-| Staging PR exists? | Search picasso PRs by date | Yes/No |
-| Staging PR merged? | `gh pr view --json state` | Open/Merged |
-| Production PR exists? | Search picasso PRs by date | Yes/No |
-| Production PR merged? | `gh pr view --json state` | Open/Merged -> **Live** |
-| Studio PR merged? | `gh pr view --json state` | Open/Merged |
+| Staging workflow | `gh run list --workflow "Publish: Staging"` | success/failure |
+| Staging PR | From workflow log or branch search | Open/Merged/Missing |
+| Production workflow | `gh run list --workflow "Publish: Production"` | success/failure |
+| Production picasso PR | From workflow log or branch search | Open/Merged/Missing |
+| Production studio PR | From workflow log or branch search | Open/Merged/**Missing if workflow failed** |
 
 #### Progress Report Format
 
@@ -479,6 +504,52 @@ gh api repos/infinity-microsoft/labs-content/branches --paginate \
   --jq '.[] | select(.name | startswith("release/")) | .name' | tail -1
 gh workflow run "Publish: Staging" --repo infinity-microsoft/labs-content --ref release/YYYY-MM-DD-HHMMSS
 ```
+
+### Production workflow fails when pushing to studio
+
+**Symptom**: picasso PR created and merged, but studio PR missing.
+
+**Error in logs**:
+```
+fatal: could not read Username for 'https://github.com': No such device or address
+```
+
+**Cause**: GitHub Actions authentication issue when pushing to studio repo.
+
+**Fix Options**:
+
+1. **Re-trigger workflow** (may fail again if auth issue persists):
+   ```bash
+   gh workflow run "Publish: Production" --repo infinity-microsoft/labs-content --ref release/YYYY-MM-DD-HHMMSS
+   ```
+
+2. **Manually create studio PR**:
+
+   ```bash
+   # 1. Clone studio repo (if not in workspace)
+   cd workspace/repos
+   gh repo clone infinity-microsoft/studio
+
+   # 2. Create branch
+   cd studio
+   git checkout -b copilotlabs-production/manual-sync
+
+   # 3. Get content from labs-content dist
+   # Copy from labs-content/content/dist/en-US/config.json to:
+   #   - studio/src/components/labs/assets/labs-config.fallback.json
+
+   # 4. Extract strings from config and update:
+   #   - studio/src/config/strings/en-US/strings.json
+
+   # 5. Copy markdown files from labs-content/content/dist/en-US/markdown/ to:
+   #   - studio/src/config/markdown-strings/en-US/
+
+   # 6. Commit and create PR
+   git add .
+   git commit -m "[Labs] update copilotlabs markdown content (manual sync)"
+   git push -u origin copilotlabs-production/manual-sync
+   gh pr create --title "[Labs] update copilotlabs markdown content" --body "Manual sync due to workflow failure"
+   ```
 
 ## Checklist
 
