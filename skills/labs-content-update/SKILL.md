@@ -336,7 +336,7 @@ Summary: 1 complete, 1 pending
 
 ### Graduate Experiment
 
-**MUST confirm with user before modifying:**
+**MUST collect info from user before modifying:**
 
 1. Show current status:
 
@@ -345,11 +345,31 @@ Summary: 1 complete, 1 pending
      --jq '.content' | base64 -d | jq '.status'
    ```
 
-2. Ask user to confirm: "将 {experiment} 的 status 从 `{current_status}` 改为 `GRADUATED`，确认？"
+2. **Ask user for graduated description** (required):
+   > "请提供 graduated 描述文案，例如：'Now available in Voice mode on desktop and mobile'"
 
-3. Only proceed after user confirms
+3. Confirm with user before proceeding
 
-Set `status: "GRADUATED"` in `metadata.json`. The experiment will be marked as graduated from Labs.
+**Changes to make in `metadata.json`:**
+
+1. Set `status: "GRADUATED"`
+2. Add `graduated` description in `assets.descriptions`:
+
+```json
+{
+  "status": "GRADUATED",
+  "assets": {
+    "descriptions": {
+      "graduated": {
+        "stringValue": "{user provided description}",
+        "i18nKey": "labs.experimentsAssets.{alias}.graduatedDescription"
+      }
+    }
+  }
+}
+```
+
+The experiment will be marked as graduated from Labs with the provided description.
 
 ### Disable/Enable Experiment
 
