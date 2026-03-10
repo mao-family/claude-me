@@ -209,7 +209,28 @@ gh api "repos/infinity-microsoft/labs-content/commits" -X GET -f sha="release/YY
   --jq '.[0:10] | .[] | "\(.sha[0:7]) \(.commit.message | split("\n")[0])"'
 ```
 
-Record which labs-content PRs are in each release.
+**STOP: Before proceeding, you MUST output a Release-Commits mapping table:**
+
+```text
+┌─────────────────────────────┬─────────────────────────────────────────────────┐
+│ Release                     │ Key Commits (newest first)                      │
+├─────────────────────────────┼─────────────────────────────────────────────────┤
+│ release/2026-03-05-064054   │ 7a0f81b (#41 Vision), d5b8b87 (#40 Skill),      │
+│                             │ 20a7ac3 (ACTION_LINK), 6ca8e23 (#39 Mico)       │
+├─────────────────────────────┼─────────────────────────────────────────────────┤
+│ release/2026-03-02-155350   │ 20a7ac3 (ACTION_LINK), 6ca8e23 (#39 Mico)       │
+├─────────────────────────────┼─────────────────────────────────────────────────┤
+│ release/2026-02-26-091642   │ 6ca8e23 (#39 Mico)                              │
+└─────────────────────────────┴─────────────────────────────────────────────────┘
+```
+
+**Key insight**: Later releases contain earlier commits. Each Update should only list **new commits** added in that release.
+
+| Update | Release | New Commits Only |
+|--------|---------|------------------|
+| 1 | release/2026-02-26-091642 | #39 Mico |
+| 2 | release/2026-03-02-155350 | ACTION_LINK (20a7ac3) |
+| 3 | release/2026-03-05-064054 | #41 Vision, #40 Skill |
 
 #### Step 3: Check Workflow Status for Each Release
 
