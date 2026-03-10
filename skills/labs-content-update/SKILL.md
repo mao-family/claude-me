@@ -209,28 +209,9 @@ gh api "repos/infinity-microsoft/labs-content/commits" -X GET -f sha="release/YY
   --jq '.[0:10] | .[] | "\(.sha[0:7]) \(.commit.message | split("\n")[0])"'
 ```
 
-**STOP: Before proceeding, you MUST output a Release-Commits mapping table:**
-
-```text
-┌─────────────────────────────┬─────────────────────────────────────────────────┐
-│ Release                     │ Key Commits (newest first)                      │
-├─────────────────────────────┼─────────────────────────────────────────────────┤
-│ release/2026-03-05-064054   │ 7a0f81b (#41 Vision), d5b8b87 (#40 Skill),      │
-│                             │ 20a7ac3 (ACTION_LINK), 6ca8e23 (#39 Mico)       │
-├─────────────────────────────┼─────────────────────────────────────────────────┤
-│ release/2026-03-02-155350   │ 20a7ac3 (ACTION_LINK), 6ca8e23 (#39 Mico)       │
-├─────────────────────────────┼─────────────────────────────────────────────────┤
-│ release/2026-02-26-091642   │ 6ca8e23 (#39 Mico)                              │
-└─────────────────────────────┴─────────────────────────────────────────────────┘
-```
+**STOP: Before proceeding, output a Release-Commits mapping table showing which new commits each release adds.**
 
 **Key insight**: Later releases contain earlier commits. Each Update should only list **new commits** added in that release.
-
-| Update | Release | New Commits Only |
-|--------|---------|------------------|
-| 1 | release/2026-02-26-091642 | #39 Mico |
-| 2 | release/2026-03-02-155350 | ACTION_LINK (20a7ac3) |
-| 3 | release/2026-03-05-064054 | #41 Vision, #40 Skill |
 
 #### Step 3: Check Workflow Status for Each Release
 
@@ -266,54 +247,39 @@ gh run view <run-id> --repo infinity-microsoft/labs-content --log 2>&1 | tail -5
 # This means: picasso PR created, but studio PR NOT created
 ```
 
-#### Step 5: Find PRs from Workflow Logs (if successful)
+#### Step 5: Find PRs
+
+**Primary method** - from workflow logs (if successful):
 
 ```bash
-# Extract PR links from successful workflow logs
 gh run view <run-id> --repo infinity-microsoft/labs-content --log 2>&1 | grep -i "github.com.*pull"
-
-# Example output:
-# https://github.com/infinity-microsoft/picasso-assets/pull/143
-# https://github.com/infinity-microsoft/studio/pull/23024
 ```
 
-#### Step 6: Alternative - Find PRs by Branch Name
-
-If workflow logs unavailable, search by branch naming convention:
+**Fallback** - search by branch naming convention:
 
 ```bash
-# Staging workflow creates branch: copilotlabs-staging-config/YYYY-MM-DD-HHMMSS
-gh pr list --repo infinity-microsoft/picasso-assets --state all \
-  --head "copilotlabs-staging-config/2026-02-27" --json number,state
-
-# Production workflow creates branches:
-# - copilotlabs-prod-config/YYYY-MM-DD-HHMMSS (picasso)
-# - copilotlabs-production/YYYY-MM-DD-HHMMSS (studio)
+# Staging: copilotlabs-staging-config/YYYY-MM-DD-HHMMSS
+# Production picasso: copilotlabs-prod-config/YYYY-MM-DD-HHMMSS
+# Production studio: copilotlabs-production/YYYY-MM-DD-HHMMSS
 gh pr list --repo infinity-microsoft/picasso-assets --state all \
   --head "copilotlabs-prod-config/2026-02-27" --json number,state
-gh pr list --repo infinity-microsoft/studio --state all \
-  --head "copilotlabs-production/2026-02-27" --json number,state
 ```
 
-#### Step 7: Verify PR Source Release Branch
+#### Step 6: Verify PR Source Release Branch
 
 **CRITICAL: A merged PR does not mean the update is complete. You MUST verify which release branch created each PR.**
 
 ```bash
-# 1. Find the workflow run ID from the PR body or search
+# 1. Find workflow run ID from PR body
 gh pr view <pr-number> --repo <repo> --json body --jq '.body' | grep -o 'actions/runs/[0-9]*'
 
 # 2. Check which release branch that workflow used
 gh run view <workflow-id> --repo infinity-microsoft/labs-content --json headBranch --jq '.headBranch'
-
-# 3. Check if your target commit is in that release branch
-gh api "repos/infinity-microsoft/labs-content/commits" -X GET -f sha="<release-branch>" \
-  --jq '.[0:10] | .[] | "\(.sha[0:7]) \(.commit.message | split("\n")[0])"'
 ```
 
-**Example**: If ACTION_LINK commit is `20a7ac3` (2026-03-02) but studio PR was created from `release/2026-02-26-091642`, then ACTION_LINK is NOT in studio - even if the PR is merged.
+**Example**: If studio PR was created from `release/2026-02-26`, it does NOT contain commits from `release/2026-03-02`.
 
-#### Step 8: Generate Progress Report
+#### Step 7: Generate Progress Report
 
 **MANDATORY: Report must include all fields below.**
 
@@ -342,43 +308,23 @@ Before finalizing report:
 │                       Labs Content Update Progress                          │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-Update 1: [Description from PR title]
-Release: release/2026-02-26-091642
-Commits: abc1234 (Graduate Mico)
-Status: ✅ Complete
+Update N: [Description]
+Release: release/YYYY-MM-DD-HHMMSS
+Commits: [new commits in this release only]
+Status: ✅ Complete | ⚠️ Partial | ❌ Blocked
 
 ┌──────────────────────┬────────┬─────────────────────┬─────────────────────────┐
 │ Stage                │ PR     │ Status              │ Source Release          │
 ├──────────────────────┼────────┼─────────────────────┼─────────────────────────┤
-│ labs-content         │ #39    │ ✅ Merged           │ -                       │
-│ picasso (staging)    │ #141   │ ✅ Merged           │ release/2026-02-26-...  │
-│ picasso (production) │ #143   │ ✅ Merged -> Live   │ release/2026-02-26-...  │
-│ studio               │ #23000 │ ✅ Merged           │ release/2026-02-26-...  │
+│ labs-content         │ #N     │ ✅ Merged           │ -                       │
+│ picasso (staging)    │ #N     │ ✅/❌ Status        │ release/...             │
+│ picasso (production) │ #N     │ ✅/❌ Status        │ release/...             │
+│ studio               │ #N     │ ✅/❌ Status        │ release/...             │
 └──────────────────────┴────────┴─────────────────────┴─────────────────────────┘
 
----
+⚠️ WARNING: [Any mismatches - PR from wrong release, missing PRs, etc.]
 
-Update 2: [Description from PR title]
-Release: release/2026-03-02-155350
-Commits: def5678 (ACTION_LINK), ghi9012 (other change)
-Status: ⚠️ Partial (picasso done, studio pending)
-
-┌──────────────────────┬────────┬─────────────────────┬─────────────────────────┐
-│ Stage                │ PR     │ Status              │ Source Release          │
-├──────────────────────┼────────┼─────────────────────┼─────────────────────────┤
-│ labs-content         │ #40    │ ✅ Merged           │ -                       │
-│ picasso (staging)    │ #147   │ ✅ Merged           │ release/2026-03-02-...  │
-│ picasso (production) │ #156   │ ✅ Merged           │ release/2026-03-02-...  │
-│ studio               │ -      │ ❌ Missing          │ Workflow failed         │
-└──────────────────────┴────────┴─────────────────────┴─────────────────────────┘
-
-⚠️ WARNING: studio PR #23024 exists but from OLDER release (2026-02-26), does NOT contain commits from this update!
-
-Next: Re-trigger Production workflow or manually create studio PR
-
----
-
-Summary: 1 complete, 1 partial (studio sync needed)
+Summary: X complete, Y partial, Z blocked
 ```
 
 ### Add New Experiment
