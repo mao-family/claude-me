@@ -1,6 +1,6 @@
 {
   "name": "claude-me",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Your personal AI digital worker / AI clone powered by Claude Code",
   "scripts": {
     "install": "./scripts/install.sh",
