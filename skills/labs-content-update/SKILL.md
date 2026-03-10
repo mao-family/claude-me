@@ -182,7 +182,14 @@ Landing Page:
 
 ### Check Progress / Resume Workflow
 
-**CRITICAL: Track ALL in-flight updates, not just the latest one.**
+**CRITICAL: You MUST complete ALL steps below. Do NOT skip. Do NOT assume.**
+
+#### Pre-flight Checklist
+
+Before starting, verify:
+
+- [ ] Correct GitHub account (`gh auth status` - use `shuyumao_microsoft` for infinity-microsoft repos)
+- [ ] Identify scope: which release branches to check
 
 #### Step 1: Collect All Recent Release Branches
 
@@ -192,9 +199,21 @@ gh api repos/infinity-microsoft/labs-content/branches --paginate \
   --jq '.[] | select(.name | startswith("release/")) | .name' | tail -10
 ```
 
-#### Step 2: For Each Release Branch, Check Workflow Status
+#### Step 2: For Each Release Branch, List Commits
 
-**CRITICAL: Check workflow status FIRST before looking for PRs.**
+**MANDATORY: You must know what commits each release contains before matching PRs.**
+
+```bash
+# List commits in a release branch
+gh api "repos/infinity-microsoft/labs-content/commits" -X GET -f sha="release/YYYY-MM-DD-HHMMSS" \
+  --jq '.[0:10] | .[] | "\(.sha[0:7]) \(.commit.message | split("\n")[0])"'
+```
+
+Record which labs-content PRs are in each release.
+
+#### Step 3: Check Workflow Status for Each Release
+
+**Check workflow status FIRST before looking for PRs.**
 
 ```bash
 # 1. Find Staging workflow runs for this release branch
@@ -215,7 +234,7 @@ gh run list --repo infinity-microsoft/labs-content \
 | Production | success | picasso prod PR + studio PR created |
 | Production | failure | **Check logs** - picasso PR may exist but studio PR missing |
 
-#### Step 3: If Workflow Failed, Check Logs
+#### Step 4: If Workflow Failed, Check Logs
 
 ```bash
 # Get failure details
@@ -226,7 +245,7 @@ gh run view <run-id> --repo infinity-microsoft/labs-content --log 2>&1 | tail -5
 # This means: picasso PR created, but studio PR NOT created
 ```
 
-#### Step 4: Find PRs from Workflow Logs (if successful)
+#### Step 5: Find PRs from Workflow Logs (if successful)
 
 ```bash
 # Extract PR links from successful workflow logs
@@ -237,7 +256,7 @@ gh run view <run-id> --repo infinity-microsoft/labs-content --log 2>&1 | grep -i
 # https://github.com/infinity-microsoft/studio/pull/23024
 ```
 
-#### Step 5: Alternative - Find PRs by Branch Name
+#### Step 6: Alternative - Find PRs by Branch Name
 
 If workflow logs unavailable, search by branch naming convention:
 
@@ -255,7 +274,7 @@ gh pr list --repo infinity-microsoft/studio --state all \
   --head "copilotlabs-production/2026-02-27" --json number,state
 ```
 
-#### Step 6: Verify PR Source Release Branch
+#### Step 7: Verify PR Source Release Branch
 
 **CRITICAL: A merged PR does not mean the update is complete. You MUST verify which release branch created each PR.**
 
@@ -273,16 +292,27 @@ gh api "repos/infinity-microsoft/labs-content/commits" -X GET -f sha="<release-b
 
 **Example**: If ACTION_LINK commit is `20a7ac3` (2026-03-02) but studio PR was created from `release/2026-02-26-091642`, then ACTION_LINK is NOT in studio - even if the PR is merged.
 
-#### Step 7: Determine Status for Each Update
+#### Step 8: Generate Progress Report
 
-| Check | Command | Status |
-|-------|---------|--------|
-| Staging workflow | `gh run list --workflow "Publish: Staging"` | success/failure |
-| Staging PR | From workflow log or branch search | Open/Merged/Missing |
-| Production workflow | `gh run list --workflow "Publish: Production"` | success/failure |
-| Production picasso PR | From workflow log or branch search | Open/Merged/Missing |
-| Production studio PR | From workflow log or branch search | Open/Merged/**Missing if workflow failed** |
-| **PR source verification** | Check workflow headBranch contains target commits | **Required** |
+**MANDATORY: Report must include all fields below.**
+
+| Field | Requirement |
+|-------|-------------|
+| Release branch | Which release this update belongs to |
+| Commits | List of commits/PRs in this release |
+| All 4 stages | labs-content, picasso staging, picasso prod, studio |
+| Source Release | For each downstream PR, verify its source release |
+| Warnings | Flag any mismatches (PR from wrong release) |
+
+#### Validation Checklist
+
+Before finalizing report:
+
+- [ ] Each release branch listed with its commits
+- [ ] Each downstream PR verified against source release
+- [ ] No PR assumed to belong to a release without verification
+- [ ] Missing PRs clearly marked with reason (workflow failed, not triggered, etc.)
+- [ ] Warnings for PRs that exist but from different release
 
 #### Progress Report Format
 
