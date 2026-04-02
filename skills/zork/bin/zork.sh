@@ -47,12 +47,19 @@ ensure_zork_dir() {
 
 # Parse dfrotz output to clean it up
 parse_output() {
-    sed -E \
-        -e '/^>save$/d' \
-        -e '/^Please enter a filename/d' \
-        -e '/^Ok\.$/d' \
-        -e 's/^>//' \
-        | grep -v '^\s*$' || true
+    sed -E 's/^>//' | grep -v -E \
+        -e '^Using .* formatting\.$' \
+        -e '^Loading .*\.z3\.$' \
+        -e '^save$' \
+        -e '^Please enter a filename' \
+        -e '^Overwrite existing file\?' \
+        -e '^Ok\.$' \
+        -e '^Failed\.$' \
+        -e '^There was no verb in that sentence!$' \
+        -e '^EOT$' \
+        -e '^ .* Score:' \
+        -e '^\s*$' \
+        || true
 }
 
 # Start new game or show current state
