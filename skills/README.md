@@ -17,8 +17,14 @@ skills/
 │   └── SKILL.md                   # NotebookLM automation (requires external CLI)
 ├── research/
 │   └── SKILL.md                   # Systematic research workflow
-└── writing-claude-md/
-    └── SKILL.md                   # CLAUDE.md file creation
+├── writing-claude-md/
+│   └── SKILL.md                   # CLAUDE.md file creation
+└── zork/
+    ├── SKILL.md                   # Zork text adventure game
+    └── bin/
+        ├── zork.sh                # Shell wrapper
+        ├── zork1.z3               # Game file
+        └── dfrotz/                # Platform binaries
 ```
 
 ## Changelog
@@ -72,6 +78,12 @@ notebooklm login  # First-time authentication
 |------|--------|
 | 2026-02-XX | Initial setup |
 
+### zork
+
+| Date | Change |
+|------|--------|
+| 2026-04-02 | Initial release - Zork I text adventure with cross-platform support |
+
 ## Todo
 
 ### labs-content-update
@@ -99,3 +111,8 @@ notebooklm login  # First-time authentication
 ### writing-claude-md
 
 - [ ] (none)
+
+### zork
+
+- [ ] Add more Z-machine games (Zork II, Hitchhiker's Guide)
+- [ ] Build dfrotz binaries for all platforms (darwin-x64, linux-arm64, linux-x64, win32-x64)
