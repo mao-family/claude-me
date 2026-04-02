@@ -11,3 +11,6 @@ workspace/repos/*
 
 # Claude Code project-level config (if created)
 .claude/
+
+# Git worktrees
+.worktrees/
