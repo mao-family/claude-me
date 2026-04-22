@@ -524,7 +524,8 @@ npm run test:update-integration-baselines   # Update baselines
 **Symptom**: picasso PR created and merged, but studio PR missing.
 
 **Error in logs**:
-```
+
+```text
 fatal: could not read Username for 'https://github.com': No such device or address
 ```
 
@@ -537,8 +538,7 @@ fatal: could not read Username for 'https://github.com': No such device or addre
 2. **Manually create studio PR**:
 
    ```bash
-   # 1. Clone studio repo (if not in workspace)
-   cd workspace/repos
+   # 1. Clone studio repo
    gh repo clone infinity-microsoft/studio
 
    # 2. Create branch

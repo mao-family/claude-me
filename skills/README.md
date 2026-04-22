@@ -11,8 +11,6 @@ skills/
 │   └── SKILL.md                   # Discover and install skills
 ├── labs-content-update/
 │   └── SKILL.md                   # Copilot Labs content management
-├── managing-workspace/
-│   └── SKILL.md                   # Workspace repo management
 ├── notebooklm/
 │   └── SKILL.md                   # NotebookLM automation (requires external CLI)
 ├── research/
@@ -60,12 +58,6 @@ notebooklm login  # First-time authentication
 |------|--------|
 | 2026-02-XX | Initial setup |
 
-### managing-workspace
-
-| Date | Change |
-|------|--------|
-| 2026-02-XX | Initial setup |
-
 ### research
 
 | Date | Change |
@@ -97,10 +89,6 @@ notebooklm login  # First-time authentication
 - [ ] Add landing page content optimization skill (improve copy, SEO, accessibility)
 
 ### find-skills
-
-- [ ] (none)
-
-### managing-workspace
 
 - [ ] (none)
 

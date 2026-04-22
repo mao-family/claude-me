@@ -119,12 +119,7 @@ For detailed markdown style guidance, see [rules/markdown.md](../rules/markdown.
 
 ### Bats Tests
 
-Bash Automated Testing System runs 4 test cases in `tests/hooks.bats`:
-
-1. Hook loads project context when in `workspace/repos/{project}/` - Verifies context loading
-2. Hook loads feature context when on `feature/*` branch - Verifies feature branch context
-3. Hook outputs nothing when not in `workspace/repos/` - Verifies boundary conditions
-4. Hook outputs nothing when project has no CLAUDE.md - Verifies graceful handling
+Bash Automated Testing System runs tests in `tests/`.
 
 Tests run automatically via pre-commit hooks before each commit.
 

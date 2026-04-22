@@ -173,10 +173,10 @@ Mark task complete
 **Archive Command:**
 
 ```bash
-cp task_plan.md workspace/memory-bank/{project}/features/{name}/
-cp findings.md workspace/memory-bank/{project}/features/{name}/
-cp progress.md workspace/memory-bank/{project}/features/{name}/
-git add workspace/memory-bank/{project}/features/{name}/
+cp task_plan.md memory-bank/features/{name}/
+cp findings.md memory-bank/features/{name}/
+cp progress.md memory-bank/features/{name}/
+git add memory-bank/features/{name}/
 git commit -m "docs: archive {name} feature context"
 ```
 
