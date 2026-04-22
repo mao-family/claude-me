@@ -34,9 +34,7 @@ Located in `hooks/` (configuration) and `scripts/hooks/` (implementation):
 Located in `skills/`, workflow guides loaded on-demand:
 
 - **find-skills** - Guide for discovering and installing skills
-- **research** - Systematic pre-development research
 - **using-lint** - Rules for using lint tools correctly
-- **writing-claude-md** - Guide for creating CLAUDE.md files
 
 ### Agents
 

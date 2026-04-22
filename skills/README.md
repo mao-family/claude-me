@@ -13,10 +13,6 @@ skills/
 │   └── SKILL.md                   # Copilot Labs content management
 ├── notebooklm/
 │   └── SKILL.md                   # NotebookLM automation (requires external CLI)
-├── research/
-│   └── SKILL.md                   # Systematic research workflow
-├── writing-claude-md/
-│   └── SKILL.md                   # CLAUDE.md file creation
 └── zork/
     ├── SKILL.md                   # Zork text adventure game
     └── bin/
@@ -58,18 +54,6 @@ notebooklm login  # First-time authentication
 |------|--------|
 | 2026-02-XX | Initial setup |
 
-### research
-
-| Date | Change |
-|------|--------|
-| 2026-02-XX | Initial setup |
-
-### writing-claude-md
-
-| Date | Change |
-|------|--------|
-| 2026-02-XX | Initial setup |
-
 ### zork
 
 | Date | Change |
@@ -89,14 +73,6 @@ notebooklm login  # First-time authentication
 - [ ] Add landing page content optimization skill (improve copy, SEO, accessibility)
 
 ### find-skills
-
-- [ ] (none)
-
-### research
-
-- [ ] (none)
-
-### writing-claude-md
 
 - [ ] (none)
 
