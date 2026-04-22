@@ -8,12 +8,9 @@ Coding standards auto-loaded every Claude Code session.
 rules/
 ├── common/           # Language-agnostic principles (always loaded)
 │   ├── coding-style.md
-│   ├── docs-sync.md
 │   ├── performance.md
 │   ├── security.md
 │   ├── using-lint.md
-│   ├── workflow.md
-│   └── writing-docs.md
 ├── shell/            # Shell script specific
 ├── typescript/       # TypeScript/JavaScript specific
 ├── python/           # Python specific

@@ -82,9 +82,3 @@ General performance principles:
 | Appropriate data structures | O(1) vs O(n) lookups |
 
 > **Language note**: Specific optimization techniques vary by language. See language-specific rules.
-
-## Related Documentation
-
-| Document | Content |
-|----------|---------|
-| [workflow.md](workflow.md) | Development workflow stages |
