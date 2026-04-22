@@ -90,14 +90,6 @@ Located in `scripts/`:
 
 - **install.sh** - Creates symlinks and sets up the plugin
 - **hooks/** - Hook implementation scripts
-- **lint/** - Lint helper scripts
-
-### Tests
-
-Located in `tests/`, Bats test files:
-
-- **hooks.bats** - Tests for hook functionality
-- **skills.bats** - Tests for skill loading
 
 ## Plugin System
 

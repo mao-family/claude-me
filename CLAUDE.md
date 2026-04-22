@@ -47,9 +47,7 @@ https://github.com/mao-family/claude-me
 │   ├── python/              # Python rules
 │   └── swift/               # Swift rules
 ├── scripts/                 # Utility scripts
-│   ├── hooks/               # Hook implementation scripts
-│   └── lint/                # Lint helper scripts
-├── tests/                   # Bats test files
+│   └── hooks/               # Hook implementation scripts
 ├── memory-bank/             # Project knowledge
 │   └── *.md                 # Architecture, stack, lint docs
 ├── CLAUDE.md                # Global instructions
