@@ -12,7 +12,6 @@ rules/
 │   ├── performance.md
 │   ├── security.md
 │   ├── using-lint.md
-│   ├── workflow.md
 │   └── writing-docs.md
 ├── shell/            # Shell script specific
 ├── typescript/       # TypeScript/JavaScript specific

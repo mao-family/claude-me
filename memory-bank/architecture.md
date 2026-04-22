@@ -12,8 +12,6 @@ All feature development follows a mandatory 6-stage workflow:
 BRAINSTORM → WORKTREE → PLAN → EXECUTE → REVIEW → FINISH
 ```
 
-See [workflow.md](workflow.md) for detailed workflow documentation.
-
 ## Core Principles
 
 1. **Human Plans, AI Executes** - You plan, I execute
@@ -66,7 +64,6 @@ rules/
 │   ├── performance.md
 │   ├── security.md
 │   ├── using-lint.md
-│   ├── workflow.md
 │   └── writing-docs.md
 ├── shell/            # Shell script rules
 │   └── coding-style.md
@@ -119,6 +116,5 @@ claude-me integrates with Claude Code's plugin system:
 
 | Document | Content |
 |----------|---------|
-| [workflow.md](workflow.md) | Development workflow |
 | [stack.md](stack.md) | Technology stack overview |
 | [lint.md](lint.md) | Detailed linting configuration |

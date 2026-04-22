@@ -10,8 +10,6 @@ Personal AI digital worker / AI clone powered by Claude Code.
 BRAINSTORM → WORKTREE → PLAN → EXECUTE → REVIEW → FINISH
 ```
 
-See [rules/common/workflow.md](rules/common/workflow.md) for constraints, [memory-bank/workflow.md](memory-bank/workflow.md) for details.
-
 ## Core Principles
 
 1. **Human Plans, AI Executes** - You plan, I execute
@@ -27,7 +25,6 @@ See [rules/common/workflow.md](rules/common/workflow.md) for constraints, [memor
 
 - `CLAUDE.md` - Global instructions (auto-loaded by Claude Code)
 - `memory-bank/` - Project knowledge:
-  - [workflow.md](memory-bank/workflow.md) - Development workflow details
   - [architecture.md](memory-bank/architecture.md) - Project structure
   - [stack.md](memory-bank/stack.md) - Technology stack
   - [lint.md](memory-bank/lint.md) - Linting configuration
