@@ -5,10 +5,6 @@ settings.local.json
 .DS_Store
 *.tmp
 
-# Workspace repos (cloned separately)
-workspace/repos/*
-!workspace/repos/.gitkeep
-
 # Claude Code project-level config (if created)
 .claude/
 

@@ -30,14 +30,12 @@ See [workflow.md](workflow.md) for detailed workflow documentation.
 Located in `hooks/` (configuration) and `scripts/hooks/` (implementation):
 
 - **hooks.json** - Hook configuration for Claude Code
-- **load-project-context.sh** - Loads project-specific CLAUDE.md
 
 ### Skills
 
 Located in `skills/`, workflow guides loaded on-demand:
 
 - **find-skills** - Guide for discovering and installing skills
-- **managing-workspace** - Manage workspace repos (add, remove, update, list)
 - **research** - Systematic pre-development research
 - **using-lint** - Rules for using lint tools correctly
 - **writing-claude-md** - Guide for creating CLAUDE.md files
@@ -116,17 +114,6 @@ claude-me integrates with Claude Code's plugin system:
 - Plugin metadata stored in `.claude-plugin/`
 - Plugin registration via `claude plugin marketplace`
 - Update with: `claude plugin marketplace update claude-me-marketplace`
-
-## Child Project Convention
-
-For projects under `workspace/repos/`:
-
-| File | Location | Purpose |
-|------|----------|---------|
-| Project CLAUDE.md | `workspace/memory-bank/{project}/CLAUDE.md` | Project-specific instructions |
-| Feature docs | `workspace/memory-bank/{project}/features/{name}/*.md` | Feature branch context |
-
-Child projects are git submodules. Their knowledge files live in `workspace/memory-bank/` to keep repos clean.
 
 ## Related Documentation
 

@@ -32,17 +32,6 @@ See [rules/common/workflow.md](rules/common/workflow.md) for constraints, [memor
   - [stack.md](memory-bank/stack.md) - Technology stack
   - [lint.md](memory-bank/lint.md) - Linting configuration
 
-### Child Projects (workspace/repos/* only)
-
-**CRITICAL: When working in `workspace/repos/{project}/`, NEVER create CLAUDE.md inside the project directory.**
-
-| File | Location | Action |
-|------|----------|--------|
-| Project CLAUDE.md | `workspace/memory-bank/{project}/CLAUDE.md` | **CREATE here**, not in `workspace/repos/{project}/` |
-| Feature docs | `workspace/memory-bank/{project}/features/{name}/*.md` | Create when on `feature/{name}` branch |
-
-**Why:** Child projects are git submodules. Their knowledge files live in `workspace/memory-bank/` to keep repos clean.
-
 ## Directory Structure
 
 ### Repository
@@ -68,9 +57,6 @@ https://github.com/mao-family/claude-me
 │   ├── *.md                 # Architecture, stack, lint docs
 │   ├── research/            # External research (third-party projects)
 │   └── insights/            # Synthesized insights (from research)
-├── workspace/
-│   ├── repos/{project}/     # Child project repositories
-│   └── memory-bank/{project}/ # Child project knowledge
 ├── CLAUDE.md                # Global instructions
 ├── mcp.json                 # MCP server config
 └── settings.json            # Claude Code settings
@@ -83,7 +69,6 @@ https://github.com/mao-family/claude-me
 ├── CLAUDE.md → claude-me
 ├── settings.json → claude-me
 ├── rules/ → claude-me
-├── workspace/ → claude-me
 ├── memory-bank/ → claude-me
 ├── settings.local.json      # Local secrets (not in repo)
 └── plugins/                 # Plugin: claude-me@claude-me-marketplace
