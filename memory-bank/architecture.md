@@ -12,8 +12,6 @@ All feature development follows a mandatory 6-stage workflow:
 BRAINSTORM → WORKTREE → PLAN → EXECUTE → REVIEW → FINISH
 ```
 
-See [workflow.md](workflow.md) for detailed workflow documentation.
-
 ## Core Principles
 
 1. **Human Plans, AI Executes** - You plan, I execute
@@ -39,7 +37,6 @@ Located in `skills/`, workflow guides loaded on-demand:
 - **research** - Systematic pre-development research
 - **using-lint** - Rules for using lint tools correctly
 - **writing-claude-md** - Guide for creating CLAUDE.md files
-- **writing-docs** - Markdown style and progressive disclosure rules
 
 ### Agents
 
@@ -62,12 +59,9 @@ Located in `rules/`, coding standards auto-loaded every session:
 rules/
 ├── common/           # Language-agnostic rules
 │   ├── coding-style.md
-│   ├── docs-sync.md
 │   ├── performance.md
 │   ├── security.md
 │   ├── using-lint.md
-│   ├── workflow.md
-│   └── writing-docs.md
 ├── shell/            # Shell script rules
 │   └── coding-style.md
 ├── typescript/       # TypeScript/JavaScript rules
@@ -98,7 +92,7 @@ Located in `scripts/`:
 
 - **install.sh** - Creates symlinks and sets up the plugin
 - **hooks/** - Hook implementation scripts
-- **lint/** - Lint helper scripts (check-lint-disables.sh)
+- **lint/** - Lint helper scripts
 
 ### Tests
 
@@ -119,6 +113,5 @@ claude-me integrates with Claude Code's plugin system:
 
 | Document | Content |
 |----------|---------|
-| [workflow.md](workflow.md) | Development workflow |
 | [stack.md](stack.md) | Technology stack overview |
 | [lint.md](lint.md) | Detailed linting configuration |
