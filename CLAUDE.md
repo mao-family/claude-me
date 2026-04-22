@@ -51,9 +51,7 @@ https://github.com/mao-family/claude-me
 │   └── lint/                # Lint helper scripts
 ├── tests/                   # Bats test files
 ├── memory-bank/             # Project knowledge
-│   ├── *.md                 # Architecture, stack, lint docs
-│   ├── research/            # External research (third-party projects)
-│   └── insights/            # Synthesized insights (from research)
+│   └── *.md                 # Architecture, stack, lint docs
 ├── CLAUDE.md                # Global instructions
 ├── mcp.json                 # MCP server config
 └── settings.json            # Claude Code settings
