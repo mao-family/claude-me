@@ -113,13 +113,9 @@ Markdown style checker. Configuration in `.markdownlint.json`:
 | `MD049` | `underscore` | Underscore for emphasis |
 | `MD050` | `asterisk` | Asterisk for strong |
 
-For detailed markdown style guidance, see [rules/markdown.md](../rules/markdown.md).
+For detailed markdown style guidance, see [.markdownlint.json](../.markdownlint.json).
 
 ## Testing
-
-### Bats Tests
-
-Bash Automated Testing System runs tests in `tests/`.
 
 Tests run automatically via pre-commit hooks before each commit.
 
@@ -130,10 +126,9 @@ Available via `bun run`:
 | Script | Command | Purpose |
 |--------|---------|---------|
 | `lint` | `pre-commit run --all-files` | Run all linters |
-| `lint:shell` | `shellcheck hooks/*.sh scripts/*.sh` | Shell lint only |
+| `lint:shell` | `shellcheck scripts/**/*.sh` | Shell lint only |
 | `lint:markdown` | `npx markdownlint-cli2 '**/*.md'` | Markdown lint only |
-| `lint:format` | `shfmt -d hooks/*.sh scripts/*.sh` | Check shell formatting |
-| `test` | `bats tests/hooks.bats` | Run tests only |
+| `lint:format` | `shfmt -d scripts/**/*.sh` | Check shell formatting |
 
 ## Quick Reference
 
@@ -145,7 +140,6 @@ bun run lint
 bun run lint:shell      # ShellCheck
 bun run lint:markdown   # markdownlint
 bun run lint:format     # shfmt (diff mode)
-bun run test            # Bats tests
 ```
 
 ## Related Documentation
