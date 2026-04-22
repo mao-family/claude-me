@@ -37,7 +37,6 @@ Located in `skills/`, workflow guides loaded on-demand:
 - **research** - Systematic pre-development research
 - **using-lint** - Rules for using lint tools correctly
 - **writing-claude-md** - Guide for creating CLAUDE.md files
-- **writing-docs** - Markdown style and progressive disclosure rules
 
 ### Agents
 
@@ -60,11 +59,9 @@ Located in `rules/`, coding standards auto-loaded every session:
 rules/
 ├── common/           # Language-agnostic rules
 │   ├── coding-style.md
-│   ├── docs-sync.md
 │   ├── performance.md
 │   ├── security.md
 │   ├── using-lint.md
-│   └── writing-docs.md
 ├── shell/            # Shell script rules
 │   └── coding-style.md
 ├── typescript/       # TypeScript/JavaScript rules

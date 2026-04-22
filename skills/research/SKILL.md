@@ -151,12 +151,6 @@ All agents run in parallel. After all complete, synthesize into insight.
 
 ## Calling Other Skills
 
-Before writing markdown, invoke the `writing-docs` skill to ensure proper formatting:
-
-- Progressive disclosure
-- Markdown style rules
-- No duplication
-
 ## Examples
 
 ### Example 1: Single source

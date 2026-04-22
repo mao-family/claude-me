@@ -5,8 +5,6 @@ description: Guide for creating or updating CLAUDE.md files. Use this skill when
 
 # Writing CLAUDE.md
 
-**REQUIRED SUB-SKILL:** Use claude-me:writing-docs for Markdown formatting rules.
-
 CLAUDE.md is the instruction file for Claude Code, auto-loaded at session start.
 
 **Default behavior:** Always generate for the **current working directory** (`pwd`). Don't ask which project — analyze the project you're in.
