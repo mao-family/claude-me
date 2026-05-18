@@ -55,10 +55,6 @@ https://github.com/mao-family/claude-me
 ~/.mcp.json → claude-me/mcp.json
 ```
 
-Note: `claude-me/CLAUDE.md` is this repo's own README — it is **not**
-symlinked to `~/.claude/CLAUDE.md`. Claude Code does not auto-load a
-global CLAUDE.md in this setup.
-
 ## Commands
 
 ```bash
