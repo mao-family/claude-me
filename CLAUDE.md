@@ -19,16 +19,6 @@ BRAINSTORM → WORKTREE → PLAN → EXECUTE → REVIEW → FINISH
 5. **Encode Taste into Tooling** - Codify preferences into skills, agents, hooks
 6. **Progressive Disclosure** - Docs link to details, never duplicate
 
-## Knowledge Locations
-
-### claude-me
-
-- `CLAUDE.md` - Global instructions (auto-loaded by Claude Code)
-- `memory-bank/` - Project knowledge:
-  - [architecture.md](memory-bank/architecture.md) - Project structure
-  - [stack.md](memory-bank/stack.md) - Technology stack
-  - [lint.md](memory-bank/lint.md) - Linting configuration
-
 ## Directory Structure
 
 ### Repository
@@ -48,9 +38,7 @@ https://github.com/mao-family/claude-me
 │   └── swift/               # Swift rules
 ├── scripts/                 # Utility scripts
 │   └── hooks/               # Hook implementation scripts
-├── memory-bank/             # Project knowledge
-│   └── *.md                 # Architecture, stack, lint docs
-├── CLAUDE.md                # Global instructions
+├── CLAUDE.md                # This repo's own README (not auto-loaded)
 ├── mcp.json                 # MCP server config
 └── settings.json            # Claude Code settings
 ```
@@ -59,10 +47,8 @@ https://github.com/mao-family/claude-me
 
 ```text
 ~/.claude/
-├── CLAUDE.md → claude-me
 ├── settings.json → claude-me
 ├── rules/ → claude-me
-├── memory-bank/ → claude-me
 ├── settings.local.json      # Local secrets (not in repo)
 └── plugins/                 # Plugin: claude-me@claude-me-marketplace
 
