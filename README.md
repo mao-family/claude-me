@@ -47,5 +47,3 @@ bun run test   # Bats tests
 ```
 
 > **Tip:** During development, bump the version in `.claude-plugin/plugin.json` and run the update commands to test changes.
-
-See [memory-bank/lint.md](memory-bank/lint.md) for lint configuration details.
